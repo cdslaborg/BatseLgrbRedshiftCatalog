@@ -244,7 +244,7 @@ set ParaMonte_LIB_DIR=!ParaMonte_LIB_ROOT!\lib
 set ParaMonte_MOD_DIR=!ParaMonte_LIB_ROOT!\mod
 
 set CosmicRate_ROOT_PATH=%~dp0
-set CosmicRate_BLD_DIR=!CosmicRate_ROOT_PATH!win!PLATFORM!\!COMPILER_SUITE!\!COMPILER_VERSION!\!BTYPE!\!LTYPE!\!PTYPE!\!MTYPE!\!INTEGRATION_METHOD!
+set CosmicRate_BLD_DIR=!CosmicRate_ROOT_PATH!build\win!PLATFORM!\!COMPILER_SUITE!\!COMPILER_VERSION!\!BTYPE!\!LTYPE!\!PTYPE!\!MTYPE!\!INTEGRATION_METHOD!
 set CosmicRate_SRC_DIR=!CosmicRate_ROOT_PATH!src
 set CosmicRate_BIN_DIR=!CosmicRate_BLD_DIR!\bin
 set CosmicRate_MOD_DIR=!CosmicRate_BLD_DIR!\mod
