@@ -184,7 +184,7 @@ if !COMPILER_SUITE!==intel (
 if not defined COMPILER_VERSION (
     echo. -- !BUILD_SCRIPT_NAME! - Detecting Fortran compiler version...
     cd %~dp0
-    cd ..\lib\bmake\
+    cd ..\lib\
     call getCompilerVersion.bat
     cd %~dp0
 )
