@@ -1,13 +1,13 @@
 module BatseLgrbWorldModel_mod
 
 #ifdef H06
-    use StarFormation_mod, only: getLogSFR => getLogSFRH06
+    use StarFormation_mod, only: getLogRate => getLogRateH06
 #elif defined L08
-    use StarFormation_mod, only: getLogSFR => getLogSFRL08
+    use StarFormation_mod, only: getLogRate => getLogRateL08
 #elif defined B10
-    use StarFormation_mod, only: getLogSFR => getLogSFRB10
+    use StarFormation_mod, only: getLogRate => getLogRateB10
 #elif defined M14
-    use StarFormation_mod, only: getLogSFR => getLogSFRM14
+    use StarFormation_mod, only: getLogRate => getLogRateM14
 #else
 #error "Unknown SFR model in BatseLgrbWorldModel_mod.f90"
 #endif
@@ -395,7 +395,7 @@ contains
                                     * erfc( real( (logLisoAtFullEfficiency-mv_Avg%logLiso)*mv_logLisoInvStdSqrt2 , kind=SPR ) )
 
         ! multiply the integral result by the GRB rate density at the given redshift
-        modelIntOverLogLisoGivenZ = modelIntOverLogLisoGivenZ * exp(getLogSFR(zone,mv_logZone,twiceLogLumDisMpc))
+        modelIntOverLogLisoGivenZ = modelIntOverLogLisoGivenZ * exp(getLogRate(zone,mv_logZone,twiceLogLumDisMpc))
 
     end function getModelIntOverLogLisoGivenZ
 
@@ -497,7 +497,7 @@ contains
 #endif
 
         probGRB = getBatseEfficiency( mv_Thresh%invStdSqrt2 * ( GRB%Event(mv_igrb)%logPF53 - mv_Thresh%avg ) ) &
-                * exp( getLogSFR(zone,logZone,twiceLogLumDisMpc) &
+                * exp( getLogRate(zone,logZone,twiceLogLumDisMpc) &
                 - 0.5_RK * dot_product( MeanSubtractedVar , matmul(mv_InvCovMatLogNormModel,MeanSubtractedVar) ) )
 
     end function getProbGRB

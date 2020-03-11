@@ -577,7 +577,7 @@ if [ $? -eq 0 ]; then
     cp "${CosmicRate_ROOT_PATH}/in/${BATSE_DATA_FILE_NAME}" "${CosmicRate_BIN_DIR}/in/"
     echo >&2
 
-    EXE_NAME_WITH_OPTIONS="./${EXE_NAME} ${CosmicRate_ROOT_PATH}/in/ ${INPUT_SPEC_FILE_NAME}"
+    EXE_NAME_WITH_OPTIONS="./${EXE_NAME} ./in/ ${INPUT_SPEC_FILE_NAME}"
 
     {
     echo "# ${BUILD_NAME} runtime setup script."
