@@ -37,9 +37,9 @@ open( newunit = inFileUnit, file = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record, s
     read(inFileUnit,nml=InputData)
     inputBatseDataFile  = CmdArg%Arg(1)%record//trim(adjustl(inputBatseDataFile))
     outputBatseDataFile = CmdArg%Arg(1)%record//trim(adjustl(outputBatseDataFile))
-    write(*,*) "zoneTol: ", zoneTol
-    write(*,*) "lisoTol: ", lisoTol
-    write(*,*) "epkzTol: ", epkzTol
+    !write(*,*) "zoneTol: ", zoneTol
+    !write(*,*) "lisoTol: ", lisoTol
+    !write(*,*) "epkzTol: ", epkzTol
 close(inFileUnit)
 
 !***********************************************************************************************************************************
@@ -105,8 +105,8 @@ call readDataGRB( inputBatseDataFile    &
 
 blockSampling: block
     use ParaMonte, only: ParaDRAM
-    type(ParaDRAM) :: pd
-    call pd%runSampler  ( ndim = NPAR &
+    type(ParaDRAM) :: PD
+    call PD%runSampler  ( ndim = NPAR &
                         , getLogFunc = getLogPostProb &
                         , inputFile = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record &
                         )

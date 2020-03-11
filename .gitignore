@@ -8,17 +8,6 @@
 # https://stackoverflow.com/questions/14267441/automatically-apply-git-update-index-chmod-x-to-executable-files
 
 #########################
-# image files
-#########################
-
-*.pdf
-*.png
-*.gif
-*.jpg
-*.jpeg
-*.tiff
-
-#########################
 # Compiled source
 #########################
 
@@ -111,6 +100,31 @@ Thumbs.db
 *.app
 
 #########################
+# ParaMonte temp folders
+#########################
+
+**/.ipynb_checkpoints/*
+**/build/*
+**/temp/*
+**/bin/*
+**/___*___/*
+
+#########################
+# ParaMonte temp files
+#########################
+
+*_log.txt
+*_time.txt
+*_chain.txt
+*_report.txt
+*_restart.txt
+*.stderr
+*.temp
+*.rfn
+___*___.*
+
+
+#########################
 # CMake
 #########################
 
@@ -125,23 +139,3 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
-
-#########################
-# temporary output files
-#########################
-
-.ipynb_checkpoints/*
-build/*
-trash/*
-temp/*
-bin/*
-_*/
-
-*_log.txt
-*_time.txt
-*_chain.txt
-*_report.txt
-*_restart.txt
-*.stderr
-*.temp
-*.rfn

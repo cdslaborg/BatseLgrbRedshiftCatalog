@@ -18,7 +18,7 @@ REM set ParaMonte_LIB_ROOT=D:\Dropbox\Projects\20180101_ParaMonte\git\build\winx
 REM set ParaMonte_LIB_NAME=libparamonte_static_stack_release_intel_fortran_windows_x64_mt.lib
 
 :: input BATSE data file
-set BATSE_DATA_FILE_PATH=BATSE_1366_LGRB_P1024ph_Epk_Sch23ph.txt
+set BATSE_DATA_FILE_NAME=batse_1366_lgrb_p1024ph_epk_sch23ph.txt
 
 :: LGRB world model's SFR model: H06, L08, B10
 set           RATE_DENSITY_MODEL=B10

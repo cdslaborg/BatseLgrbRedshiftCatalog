@@ -5,72 +5,76 @@
     inputBatseDataFile  = "batse_1366_lgrb_p1024ph_epk_sch23ph.txt"
     outputBatseDataFile = "batse_1366_lgrb_pbol_epk_sbol(0.001,20000).txt"
 
-    IntegrationLimit%Zplus1min = 1.10e0
-    IntegrationLimit%Zplus1max = 2.1e1
-    IntegrationLimit%logepkmin = -6.7121659604233440
-    IntegrationLimit%logepkmax = +12.455573549219071
-
-    QuadSpecZ%nstep = 50
-    QuadSpecZ%nRefinement = 3
-    QuadSpecZ%tolerance = 1.d-4
-
-    QuadSpecLiso%nstep = 50
-    QuadSpecLiso%nRefinement = 5
-    QuadSpecLiso%tolerance = 1.d-5
-
-    QuadSpecEpkz%nstep = 50
-    QuadSpecEpkz%nRefinement = 4
-    QuadSpecEpkz%tolerance = 1.d-6
-
-    QuadSpecGRBz%nstep = 50
-    QuadSpecGRBz%nRefinement = 3
-    QuadSpecGRBz%tolerance = 1.d-4
+    zoneMin  = 1.1e0
+    zoneMax  = 2.1e1
+    zoneTol  = 1.e-3
+    lisoTol  = 5.e-5
+    epkzTol  = 1.e-6
+    zoneRef = 4
+    lisoRef = 5
+    epkzRef = 7
 
 /
 
 &ParaDRAM
 
-    description                 = "ParaDRAM sampling of the LGRB world model of BATSE 1366 LGRBs,\nwithout any redshift (Kfactor) corrections to T90 durations"
-   !outputColWidth              = 25
-    outputRealPrecision         = 8
-    fileBase                    = "./out/H06"
-   !randomSeed                  = 11111,
-    VarName                     = avgLogLiso
-                                , avgLogEpkz
-                                , avgLogEiso
-                                , avgLogT90z
-                                , stdLogLiso
-                                , stdLogEpkz
-                                , stdLogEiso
-                                , stdLogT90z
-                                , atanhCorLisoEpkz
-                                , atanhCorLisoEiso
-                                , atanhCorLisoT90z
-                                , atanhCorEpkzEiso
-                                , atanhCorEpkzT90z
-                                , atanhCorEisoT90z
-                                , avgLogThresh
-                                , stdLogThresh
-    targetAcceptanceRatio       = 0.234e0,
-    scaleFactor                 = "0.5*gelman",
-    sampleSize                  = 2500,
-    chainSize                   = 100000,
-    adaptiveUpdateCount         = 100000,
-    greedyAdaptationCount       = 0,
-    adaptiveUpdatePeriod        = 100,
-    progressReportPeriod        = 100,
-    proposalModel               = gaussian,
-    parallelModel               = singleChain,
-   !Domain(:,1)                 = 1*-1.e300,
-   !Domain(:,2)                 = 1*1.e300,
-    maxNumDomainCheckToWarn     = 100
-    maxNumDomainCheckToStop     = 1000
-    inputFileHasPriority        = .true.
-    compactChainRequested       = .true.
-    randomStartPointRequested   = .false.
-    singleRestartFileRequested  = .true.
+    ! Base
 
-    StartPoint = 
+    description                         = "ParaDRAM sampling of the LGRB world model of BATSE 1366 LGRBs,\nwith redshift Kfactor corrections to the T90 durations
+                                        \n zoneMin  = 1.1e0
+                                        \n zoneMax  = 2.1e1
+                                        \n zoneTol  = 1.e-3
+                                        \n lisoTol  = 5.e-5
+                                        \n epkzTol  = 1.e-6
+                                        \n zoneRef = 4
+                                        \n lisoRef = 5
+                                        \n epkzRef = 7
+                                        "
+   !outputColumnWidth                   = 25
+    outputRealPrecision                 = 17
+   !outputDelimiter                     = ","
+    outputFileName                      = "./out/"
+    sampleSize                          = 2500
+    randomSeed                          = 2136275,
+    chainFileFormat                     = "compact"
+    domainLowerLimitVec                 = 4*-1.e300
+    domainUpperLimitVec                 = 4*1.e300
+    parallelizationModel                = "single chain"
+    targetAcceptanceRate                = 0.23e0
+    progressReportPeriod                = 1000
+    maxNumDomainCheckToWarn             = 100
+    maxNumDomainCheckToStop             = 1000
+    inputFileHasPriority                = false
+    restartFileFormat                   = "binary"
+    silentModeRequested                 = false
+    mpiFinalizeRequested                = true
+    variableNameList                    = avgLogLiso
+                                        , avgLogEpkz
+                                        , avgLogEiso
+                                        , avgLogT90z
+                                        , stdLogLiso
+                                        , stdLogEpkz
+                                        , stdLogEiso
+                                        , stdLogT90z
+                                        , atanhCorLisoEpkz
+                                        , atanhCorLisoEiso
+                                        , atanhCorLisoT90z
+                                        , atanhCorEpkzEiso
+                                        , atanhCorEpkzT90z
+                                        , atanhCorEisoT90z
+                                        , avgLogThresh
+                                        , stdLogThresh
+
+    ! MCMC
+
+    chainSize                           = 100000
+    sampleRefinementCount               = 10
+    sampleRefinementMethod              = "BatchMeans"
+    randomStartPointDomainLowerLimitVec = 16*-1.e300
+    randomStartPointDomainUpperLimitVec = 16*+1.e300
+    randomStartPointRequested           = false
+
+    startPointVec = 
     118.488330000000
     5.63810715000000
     119.538610000000
@@ -88,11 +92,18 @@
     -1.02762285000000
     -1.19933055000000
 
-/
+    ! DRAM
 
-&ParaDRAMPropGaus
+    scaleFactor                         = "2*gelman",
+    proposalModel                       = "normal"
+    adaptiveUpdateCount                 = 10000000
+    adaptiveUpdatePeriod                = 35
+    greedyAdaptationCount               = 0
+   !delayedRejectionCount               = 5
+   !delayedRejectionScaleFactorVec      = 5*1.
+   !burninAdaptationMeasure             = 1.
 
-    StartStaDev = 
+    proposalStartStdVec = 
     0.387770435106835
     0.109060146803281
     0.400513637197473
@@ -110,7 +121,8 @@
     0.0535968762407656
     0.112539905537911
 
-    StartCorMat = 
+    proposalStartCorMat = 
+    !loglumean    logepkzmean    logeisomean    logt90zmean    loglumsigma    logepkzsigma    logeisosigma    logT90zsigma    rholumepkz    rholumeiso    rholumt90z    rhoepkzeiso    rhoepkzt90z    rhoeisot90z    Log(Cmin)    Log(Cmin_STDEV)
     1    0.920612889143527    0.993521198659336    0.420478231539109    -0.919380218208273    -0.630596982657575    -0.882203361999699    -0.100763493963807    -0.548193084131114    -0.169337322562449    0.365995983004552    -0.583895041165684    -0.147322779903500    0.384005244766499    -0.773040794291418    -0.593936746457306
     0.920612889143527    1    0.938126996591237    0.474405375606713    -0.836172022237616    -0.799913775188584    -0.855255894684815    -0.103708143591947    -0.781161925086888    -0.326106650155059    0.230015393983673    -0.790088305458112    -0.212214065190017    0.270054517753107    -0.728733032731705    -0.561140468327253
     0.993521198659336    0.938126996591236    1    0.481511853583969    -0.928476324784581    -0.659644067943737    -0.916002925431065    -0.101818393371787    -0.594217291721228    -0.258492792785019    0.306871390873191    -0.621756533923968    -0.189803146949192    0.340019892538743    -0.769538143939498    -0.580797904201862

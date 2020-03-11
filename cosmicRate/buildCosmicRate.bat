@@ -8,7 +8,7 @@
 set ERRORLEVEL=0
 cd %~dp0
 
-set BUILD_SCRIPT_NAME=CosmicRate
+set BUILD_NAME=CosmicRate
 
 echo.
 echo. :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -27,7 +27,7 @@ REM set ParaMonte_ROOT_RELATIVE_PATH=..\..\..\20180101_ParaMonte\git
 call configCosmicRate.bat
 if %ERRORLEVEL%==1 (
     echo. 
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: Unable to configure and build flags. exiting...
+    echo. -- !BUILD_NAME! - Fatal Error: Unable to configure and build flags. exiting...
     echo. 
     cd %~dp0
     exit /B 1
@@ -43,16 +43,16 @@ if errorlevel 1 (
     set LTYPE=static
 ) else (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: ParaMonte library type could not be recognized.
-    echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
+    echo. -- !BUILD_NAME! - Fatal Error: ParaMonte library type could not be recognized.
+    echo. -- !BUILD_NAME! - build failed. exiting...
     echo.
     cd %~dp0
     set ERRORLEVEL=1
     exit /B 1
 )
 
-echo. -- !BUILD_SCRIPT_NAME! - ParaMonte library name: !ParaMonte_LIB_NAME!
-echo. -- !BUILD_SCRIPT_NAME! - ParaMonte library type: !LTYPE!
+echo. -- !BUILD_NAME! - ParaMonte library name: !ParaMonte_LIB_NAME!
+echo. -- !BUILD_NAME! - ParaMonte library type: !LTYPE!
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: determine library build
@@ -66,8 +66,8 @@ if errorlevel 1 (
         echo !ParaMonte_LIB_NAME!|find "debug" >nul
         if errorlevel 1 (
             echo.
-            echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: ParaMonte library build could not be recognized.
-            echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
+            echo. -- !BUILD_NAME! - Fatal Error: ParaMonte library build could not be recognized.
+            echo. -- !BUILD_NAME! - build failed. exiting...
             echo.
             cd %~dp0
             set ERRORLEVEL=1
@@ -82,7 +82,7 @@ if errorlevel 1 (
     set BTYPE=release
 )
 
-echo. -- !BUILD_SCRIPT_NAME! - ParaMonte library build: !BTYPE!
+echo. -- !BUILD_NAME! - ParaMonte library build: !BTYPE!
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: determine library parallelism
@@ -112,7 +112,7 @@ if errorlevel 1 (
     set PTYPE=mpi
 )
 
-echo. -- !BUILD_SCRIPT_NAME! - ParaMonte library parallelism: !PTYPE!
+echo. -- !BUILD_NAME! - ParaMonte library parallelism: !PTYPE!
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: determine library target language
@@ -139,7 +139,7 @@ if errorlevel 1 (
     set TARGET_LANG=Fortran
 )
 
-echo. -- !BUILD_SCRIPT_NAME! - target language: !TARGET_LANG!
+echo. -- !BUILD_NAME! - target language: !TARGET_LANG!
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: set default C/CPP/Fortran compilers/linkers
@@ -168,8 +168,8 @@ if !COMPILER_SUITE!==intel (
 ) else (
 
     echo. 
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: unsupported compiler suite: !COMPILER_SUITE!
-    echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
+    echo. -- !BUILD_NAME! - Fatal Error: unsupported compiler suite: !COMPILER_SUITE!
+    echo. -- !BUILD_NAME! - build failed. exiting...
     echo. 
     cd %~dp0
     set ERRORLEVEL=1
@@ -182,19 +182,19 @@ if !COMPILER_SUITE!==intel (
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 if not defined COMPILER_VERSION (
-    echo. -- !BUILD_SCRIPT_NAME! - Detecting Fortran compiler version...
+    echo. -- !BUILD_NAME! - Detecting Fortran compiler version...
     cd %~dp0
     cd ..\lib\bmake\
     call getCompilerVersion.bat
     cd %~dp0
 )
 
-echo. -- !BUILD_SCRIPT_NAME! - COMPILER_VERSION: !COMPILER_VERSION!
-echo. -- !BUILD_SCRIPT_NAME! - COMPILER_NAME: !FCL!
-echo. -- !BUILD_SCRIPT_NAME! - CFI_ENABLED: !CFI_ENABLED!
-echo. -- !BUILD_SCRIPT_NAME! - parallelism: !PTYPE!
-echo. -- !BUILD_SCRIPT_NAME! - build type: !BTYPE!
-echo. -- !BUILD_SCRIPT_NAME! - link type: !LTYPE!
+echo. -- !BUILD_NAME! - COMPILER_VERSION: !COMPILER_VERSION!
+echo. -- !BUILD_NAME! - COMPILER_NAME: !FCL!
+echo. -- !BUILD_NAME! - CFI_ENABLED: !CFI_ENABLED!
+echo. -- !BUILD_NAME! - parallelism: !PTYPE!
+echo. -- !BUILD_NAME! - build type: !BTYPE!
+echo. -- !BUILD_NAME! - link type: !LTYPE!
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: initialize preprocessor flags
@@ -218,8 +218,8 @@ if !KFAC_CORRECTION!==kfacOneThird (
 ) else (
     if !KFAC_CORRECTION! NEQ kfacNone (
         echo.
-        echo. -- !BUILD_SCRIPT_NAME! - Fatal Error occurred: KFAC_CORRECTION=!KFAC_CORRECTION! is not recognized as an option.
-        echo. -- !BUILD_SCRIPT_NAME! - exiting...
+        echo. -- !BUILD_NAME! - Fatal Error occurred: KFAC_CORRECTION=!KFAC_CORRECTION! is not recognized as an option.
+        echo. -- !BUILD_NAME! - exiting...
         echo.
         cd %~dp0
         set ERRORLEVEL=1
@@ -231,9 +231,9 @@ set MTYPE=!KFAC_CORRECTION!!RATE_DENSITY_MODEL!
 :: set the executable's name
 
 echo.
-echo. -- !BUILD_SCRIPT_NAME! - Fortran preprocessor macros: !FPP_FLAGS!
-echo. -- !BUILD_SCRIPT_NAME! - executable name: !EXE_NAME!
-echo. -- !BUILD_SCRIPT_NAME! - model: !MTYPE!
+echo. -- !BUILD_NAME! - Fortran preprocessor macros: !FPP_FLAGS!
+echo. -- !BUILD_NAME! - executable name: !EXE_NAME!
+echo. -- !BUILD_NAME! - model: !MTYPE!
 echo.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -261,7 +261,7 @@ for %%A in (
     ) do (  if exist %%A (
                 echo. -- %%A already exists. skipping...
             ) else (
-                echo. -- !BUILD_SCRIPT_NAME! - generating directory: %%A
+                echo. -- !BUILD_NAME! - generating directory: %%A
                 mkdir %%A
             )
 )
@@ -269,7 +269,7 @@ echo.
 
 if !CosmicRate_OBJ_ENABLED! NEQ true (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping object files build...
+    echo. -- !BUILD_NAME! - Warning: skipping object files build...
     echo.
     goto LABEL_CosmicRate_EXE_ENABLED
 )
@@ -282,15 +282,15 @@ if !CosmicRate_OBJ_ENABLED! NEQ true (
 
 cd !CosmicRate_OBJ_DIR!
 echo.
-echo. -- !BUILD_SCRIPT_NAME! - building for the rate model of !RATE_DENSITY_MODEL!...
+echo. -- !BUILD_NAME! - building for the rate model of !RATE_DENSITY_MODEL!...
 
 :: First verify the source filelist exists
 
 set CosmicRate_FILE_LIST=!CosmicRate_SRC_DIR!\filelist.txt
 if not exist !CosmicRate_FILE_LIST! (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: The filelist.txt containing the source filenames does not exist. Path: !CosmicRate_FILE_LIST!
-    echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
+    echo. -- !BUILD_NAME! - Fatal Error: The filelist.txt containing the source filenames does not exist. Path: !CosmicRate_FILE_LIST!
+    echo. -- !BUILD_NAME! - build failed. exiting...
     echo.
     cd %~dp0
     set ERRORLEVEL=1
@@ -302,7 +302,7 @@ if not exist !CosmicRate_FILE_LIST! (
 for /F "eol=! tokens=*" %%A in (!CosmicRate_FILE_LIST!) do (
 
     echo. 
-    echo. -- !BUILD_SCRIPT_NAME! - generating object file for %%A
+    echo. -- !BUILD_NAME! - generating object file for %%A
     echo. 
 
     if !PTYPE!==mpi (
@@ -313,8 +313,8 @@ for /F "eol=! tokens=*" %%A in (!CosmicRate_FILE_LIST!) do (
         /c !CosmicRate_SRC_DIR!\%%A                %=path to input CosmicRate source file=%  ^
         || (
             echo. 
-            echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: compilation of the object file for %%A failed.
-            echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
+            echo. -- !BUILD_NAME! - Fatal Error: compilation of the object file for %%A failed.
+            echo. -- !BUILD_NAME! - build failed. exiting...
             echo. 
             cd %~dp0
             set ERRORLEVEL=1
@@ -328,8 +328,8 @@ for /F "eol=! tokens=*" %%A in (!CosmicRate_FILE_LIST!) do (
         /c !CosmicRate_SRC_DIR!\%%A                %=path to input CosmicRate source file=%  ^
         || (
             echo. 
-            echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: compilation of the object file for %%A failed.
-            echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
+            echo. -- !BUILD_NAME! - Fatal Error: compilation of the object file for %%A failed.
+            echo. -- !BUILD_NAME! - build failed. exiting...
             echo. 
             cd %~dp0
             set ERRORLEVEL=1
@@ -347,7 +347,7 @@ echo.
 
 if !CosmicRate_EXE_ENABLED! NEQ true (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping exectuable build...
+    echo. -- !BUILD_NAME! - Warning: skipping exectuable build...
     echo.
     goto LABEL_CosmicRate_RUN_ENABLED
 )
@@ -357,7 +357,7 @@ echo.
 if !LTYPE!==dynamic (
 
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal: dynamically-linked executable not implemented. This requires significant changes in the library interfaces.
+    echo. -- !BUILD_NAME! - Fatal: dynamically-linked executable not implemented. This requires significant changes in the library interfaces.
     echo.
     cd %~dp0
     set ERRORLEVEL=1
@@ -365,7 +365,7 @@ if !LTYPE!==dynamic (
 
 ) else (    %= static linking requested =%
 
-    echo. -- !BUILD_SCRIPT_NAME! - generating statically-linked executable at: !CosmicRate_BIN_DIR!
+    echo. -- !BUILD_NAME! - generating statically-linked executable at: !CosmicRate_BIN_DIR!
 
     REM set EXE_NAME=!RATE_DENSITY_MODEL!.exe
     set REQUIRED_OBJECT_FILES=!CosmicRate_OBJ_DIR!\*.obj !ParaMonte_LIB_DIR!\!ParaMonte_LIB_NAME!
@@ -373,13 +373,13 @@ if !LTYPE!==dynamic (
 )
 
 :: delete the old executable first
-echo. -- !BUILD_SCRIPT_NAME! - deleting old executable (if any) at: !CosmicRate_BIN_DIR!\!EXE_NAME!
+echo. -- !BUILD_NAME! - deleting old executable (if any) at: !CosmicRate_BIN_DIR!\!EXE_NAME!
 
 cd !CosmicRate_BIN_DIR!
 del !EXE_NAME!
 if !ERRORLEVEL!==1 (
     echo. 
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: deletion of the old executable at !CosmicRate_BIN_DIR!\!EXE_NAME! failed. exiting...
+    echo. -- !BUILD_NAME! - Fatal Error: deletion of the old executable at !CosmicRate_BIN_DIR!\!EXE_NAME! failed. exiting...
     echo. 
     cd %~dp0
     set ERRORLEVEL=1
@@ -389,7 +389,7 @@ if !ERRORLEVEL!==1 (
 :: build the executable
 
 echo. 
-echo. -- !BUILD_SCRIPT_NAME! - Link command: !FCL! !FCL_FLAGS! !FL_FLAGS! !REQUIRED_OBJECT_FILES! /link /out:!CosmicRate_BIN_DIR!\!EXE_NAME!
+echo. -- !BUILD_NAME! - Link command: !FCL! !FCL_FLAGS! !FL_FLAGS! !REQUIRED_OBJECT_FILES! /link /out:!CosmicRate_BIN_DIR!\!EXE_NAME!
 echo. 
 
 if !PTYPE!==mpi (
@@ -407,8 +407,8 @@ if !PTYPE!==mpi (
 
 if !ERRORLEVEL!==1 ( 
     echo. 
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: linking of the object files might have failed.
-    echo. -- !BUILD_SCRIPT_NAME! - build might have failed. continuing...
+    echo. -- !BUILD_NAME! - Fatal Error: linking of the object files might have failed.
+    echo. -- !BUILD_NAME! - build might have failed. continuing...
     echo. 
     cd %~dp0
     set ERRORLEVEL=1
@@ -418,15 +418,15 @@ echo.
 
 :: copy necessary input files in the executable's directory
 
-echo. -- !BUILD_SCRIPT_NAME! - copying input files to the executable's directory
-echo. -- !BUILD_SCRIPT_NAME! - from: !CosmicRate_ROOT_PATH!\in\!MTYPE!.nml   %= no need for final slash here =%
-echo. -- !BUILD_SCRIPT_NAME! -   to: !CosmicRate_BIN_DIR!\in\  %= final slash tells this is folder =%
+echo. -- !BUILD_NAME! - copying input files to the executable's directory
+echo. -- !BUILD_NAME! - from: !CosmicRate_ROOT_PATH!\in\!MTYPE!.nml   %= no need for final slash here =%
+echo. -- !BUILD_NAME! -   to: !CosmicRate_BIN_DIR!\in\  %= final slash tells this is folder =%
 xcopy /s /Y "!CosmicRate_ROOT_PATH!\in\!MTYPE!.nml" "!CosmicRate_BIN_DIR!\in\"
 echo.
-echo. -- !BUILD_SCRIPT_NAME! - copying BATSE data to the executable's directory
-echo. -- !BUILD_SCRIPT_NAME! - from: !CosmicRate_ROOT_PATH!\in\BATSE_1366_LGRB_P1024ph_Epk_Sch23ph.txt   %= no need for final slash here =%
-echo. -- !BUILD_SCRIPT_NAME! -   to: !CosmicRate_BIN_DIR!\in\  %= final slash tells this is folder =%
-xcopy /s /Y "!CosmicRate_ROOT_PATH!\in\!BATSE_DATA_FILE_PATH!" "!CosmicRate_BIN_DIR!\in\"
+echo. -- !BUILD_NAME! - copying BATSE data to the executable's directory
+echo. -- !BUILD_NAME! - from: !CosmicRate_ROOT_PATH!\in\!BATSE_DATA_FILE_NAME!   %= no need for final slash here =%
+echo. -- !BUILD_NAME! -   to: !CosmicRate_BIN_DIR!\in\  %= final slash tells this is folder =%
+xcopy /s /Y "!CosmicRate_ROOT_PATH!\in\!BATSE_DATA_FILE_NAME!" "!CosmicRate_BIN_DIR!\in\"
 echo.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -439,7 +439,7 @@ echo.
 :: if !CosmicRate_RUN_ENABLED! NEQ true goto LABEL_EXAMPLE_ENABLED
 if !CosmicRate_RUN_ENABLED! NEQ true (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping the executable run...
+    echo. -- !BUILD_NAME! - Warning: skipping the executable run...
     echo.
     goto :eof
 )
@@ -461,12 +461,12 @@ cd !CosmicRate_BIN_DIR!
 !EXE_NAME! .\in\ !MTYPE!.nml && ( 
     echo.
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - executable run successful. 
+    echo. -- !BUILD_NAME! - executable run successful. 
     echo.
 ) || ( 
     echo.
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - executable run failed. exiting...
+    echo. -- !BUILD_NAME! - executable run failed. exiting...
     echo.
     cd %~dp0
     set ERRORLEVEL=1

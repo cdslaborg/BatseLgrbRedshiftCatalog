@@ -193,8 +193,8 @@ contains
         !write(output_unit,"(*(g20.13))") ((mv_CholeskyLowerLogNormModel(i,j),j=1,NVAR),new_line("A"),i=1,NVAR)
         call getCholeskyFactor(NVAR,mv_CholeskyLowerLogNormModel,mv_DiagonalLogNormModel)
         if (mv_DiagonalLogNormModel(1)<0._RK) then
-            write(output_unit,"(*(g0))") "covariance matrix not positive definite..cycling.."
-            write(output_unit,"(*(g20.13))") ((mv_CholeskyLowerLogNormModel(i,j),j=1,NVAR),new_line("A"),i=1,NVAR)
+            !write(output_unit,"(*(g0))") "covariance matrix not positive definite..cycling.."
+            !write(output_unit,"(*(g20.13))") ((mv_CholeskyLowerLogNormModel(i,j),j=1,NVAR),new_line("A"),i=1,NVAR)
             logPostProb = -huge(logPostProb)
             return
         end if
