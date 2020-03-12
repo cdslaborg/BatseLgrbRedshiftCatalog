@@ -11,10 +11,16 @@ module BatseLgrbWorldModel_mod
 #else
 #error "Unknown SFR model in BatseLgrbWorldModel_mod.f90"
 #endif
-    use Constants_mod, only: IK, RK, PI, NEGINF_RK
+    use Constants_mod, only: IK, RK, SPR, PI, NEGINF_RK
     use Batse_mod, only: GRB
 
     implicit none
+
+#ifdef ERR_ESTIMATION_ENABLED
+    real(RK)                :: zone_relerr, zgrb_relerr, liso_relerr, epkz_relerr
+    real(RK)                :: zone_neval, zgrb_neval, liso_neval, epkz_neval
+    integer(IK)             :: zgrb_count, liso_count, epkz_count
+#endif
 
     character(*), parameter :: MODULE_NAME = "@BatseLgrbWorldModel_mod"
 
@@ -22,24 +28,25 @@ module BatseLgrbWorldModel_mod
     ! world model parameters
     ! *********************************************
 
-    integer(IK), parameter :: NVAR = 4     ! number of GRB attributes used in the world model
-    integer(IK), parameter :: NPAR = 16    ! number of world model's parameters
+    integer(IK) , parameter :: ERFK = RK    ! the real kind of the input value to erf()
+    integer(IK) , parameter :: NVAR = 4     ! number of GRB attributes used in the world model
+    integer(IK) , parameter :: NPAR = 16    ! number of world model's parameters
 
     ! the normalization factor of the multivariate log-normal distribution
 
-    real(RK), parameter :: SQRT_TWOPI_POW_NVAR = sqrt((2._RK*PI)**NVAR)
+    real(RK)    , parameter :: SQRT_TWOPI_POW_NVAR = sqrt((2._RK*PI)**NVAR)
 
     ! the exponent of zone in time-dilation translation of T90 to T90z
 
 #ifdef kfacOneThird
-    real(RK), parameter :: TIME_DILATION_EXPO = 0.666666666666667_RK
+    real(RK)    , parameter :: TIME_DILATION_EXPO = 0.666666666666667_RK
 #endif
 
     ! the half-width of efficiency curve from 0 to 1, in units of threshold standard deviation
-    real(RK), parameter :: THRESH_HALF_WIDTH = 4._RK
+    real(RK)    , parameter :: THRESH_HALF_WIDTH = 4._RK
 
-    real(RK), parameter :: INTEGRATION_LIMIT_LOGEPK_MIN = -6.712165960423344_RK
-    real(RK), parameter :: INTEGRATION_LIMIT_LOGEPK_MAX = 12.455573549219071_RK
+    real(RK)    , parameter :: INTEGRATION_LIMIT_LOGEPK_MIN = -6.712165960423344_RK
+    real(RK)    , parameter :: INTEGRATION_LIMIT_LOGEPK_MAX = 12.455573549219071_RK
 
     ! *********************************************
     ! variables to be read from the input file
@@ -252,6 +259,17 @@ contains
             error stop
         end if
 #else
+#ifdef ERR_ESTIMATION_ENABLED
+        zgrb_count  = 0_IK
+        liso_count  = 0_IK
+        epkz_count  = 0_IK
+        zgrb_neval  = 0._RK
+        liso_neval  = 0._RK
+        epkz_neval  = 0._RK
+        zgrb_relerr = 0._RK
+        liso_relerr = 0._RK
+        epkz_relerr = 0._RK
+#endif
         call doQuadRombOpen ( getFunc           = getModelIntOverLogLisoGivenZ  &
                             , integrate         = midexp                        &
                             , lowerLim          = zoneMin                       &
@@ -268,6 +286,10 @@ contains
             write(output_unit,"(*(g0))") ErrorMessage(ierr)
             error stop
         end if
+#ifdef ERR_ESTIMATION_ENABLED
+        zone_neval  = neval
+        zone_relerr = abs(relerr) / modelint
+#endif
 #endif
         if (modelint<=0.0_RK) then
             write(output_unit,"(*(g0))") "model_integral (variable modelint in getLogPostProb.f90) is non-positive: ", modelint
@@ -333,14 +355,28 @@ contains
                 write(output_unit,"(*(g0))") ErrorMessage(ierr)
                 error stop
             end if
+#ifdef ERR_ESTIMATION_ENABLED
+        zgrb_count  = zgrb_count + 1_IK
+        zgrb_neval  = zgrb_neval + neval
+        zgrb_relerr = zgrb_relerr + abs(relerr) / probGRB
+#endif
 #endif
             if (probGRB<=0.0_RK) then
-                write(output_unit,"(*(g0))") "WARNING: probGRB <= 0.0_RK: ", probGRB, ". Setting logPostProb = NEGINF_RK ..."
+                !write(output_unit,"(*(g0))") "WARNING: probGRB <= 0.0_RK: ", probGRB, ". Setting logPostProb = NEGINF_RK ..."
                 logPostProb = NEGINF_RK
                 exit loopLogPostProb
             end if
             logPostProb = logPostProb + log( probGRB / (modelint*normFac) )
         end do loopLogPostProb
+
+#ifdef ERR_ESTIMATION_ENABLED
+        zgrb_neval = zgrb_neval / zgrb_count
+        liso_neval = liso_neval / liso_count
+        epkz_neval = epkz_neval / epkz_count
+        zgrb_relerr = zgrb_relerr / zgrb_count
+        liso_relerr = liso_relerr / liso_count
+        epkz_relerr = epkz_relerr / epkz_count
+#endif
 
     end function getLogPostProb
 
@@ -384,7 +420,11 @@ contains
                                 , numFuncEval       = neval                                         &
                                 , ierr              = ierr                                          &
                                 )
-!write(*,*) "Liso: ", neval, relerr / modelIntOverLogLisoGivenZ
+#ifdef ERR_ESTIMATION_ENABLED
+        liso_count  = liso_count + 1_IK
+        liso_neval  = liso_neval + neval
+        liso_relerr = liso_relerr + abs(relerr) / modelIntOverLogLisoGivenZ
+#endif
         if (ierr/=0) then
             write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(ierr)
             error stop
@@ -392,7 +432,7 @@ contains
 
         ! add the analytical integral of the logLiso range within which BATSE efficiency is 100%
         modelIntOverLogLisoGivenZ   = modelIntOverLogLisoGivenZ + 0.5_RK &
-                                    * erfc( real( (logLisoAtFullEfficiency-mv_Avg%logLiso)*mv_logLisoInvStdSqrt2 , kind=SPR ) )
+                                    * erfc( real( (logLisoAtFullEfficiency-mv_Avg%logLiso)*mv_logLisoInvStdSqrt2 , kind=ERFK ) )
 
         ! multiply the integral result by the GRB rate density at the given redshift
         modelIntOverLogLisoGivenZ = modelIntOverLogLisoGivenZ * exp(getLogRate(zone,mv_logZone,twiceLogLumDisMpc))
@@ -408,7 +448,7 @@ contains
         use Batse_mod, only: MIN_LOGPH53_4_LOGPBOLZERO
         use Integration_mod, only: doQuadRombClosed, ErrorMessage
        !use IntegrationOverEpkz_mod, only: doQuadRombClosed, ErrorMessage
-        use Constants_mod, only: RK, SPR
+        use Constants_mod, only: RK
 
         implicit none
         character(*), parameter :: PROCEDURE_NAME = "@getModelIntOverLogEpkzGivenLogLisoZ()"
@@ -429,7 +469,11 @@ contains
                                 , numFuncEval       =  neval                            &
                                 , ierr              =  ierr                             &
                                 )
-!write(*,*) "Epkz: ", neval, relerr / modelIntOverLogEpkzGivenLogLisoZ
+#ifdef ERR_ESTIMATION_ENABLED
+        epkz_count  = epkz_count + 1_IK
+        epkz_neval  = epkz_neval + neval
+        epkz_relerr = epkz_relerr + abs(relerr) / modelIntOverLogEpkzGivenLogLisoZ
+#endif
         if (ierr/=0) then
             write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(ierr)
             error stop
@@ -438,11 +482,11 @@ contains
         ! add integral of the tails of the conditional logEpkz distribution given mv_logLiso
         modelIntOverLogEpkzGivenLogLisoZ = modelIntOverLogEpkzGivenLogLisoZ + &
         ! efficiency is fixed for the tails of logEpkz distribution beyond the logEpkz limits
-        ( 0.5_RK + 0.5_RK*erf(real((MIN_LOGPH53_4_LOGPBOLZERO+mv_logPbol-mv_Thresh%avg)*mv_Thresh%invStdSqrt2,kind=SPR)) ) * &
+        ( 0.5_RK + 0.5_RK*erf(real((MIN_LOGPH53_4_LOGPBOLZERO+mv_logPbol-mv_Thresh%avg)*mv_Thresh%invStdSqrt2,kind=ERFK)) ) * &
         ! sum of integrals of the tails of the conditional logEpkz distribution given mv_logLiso
         ( 1.0_RK + 0.5_RK * ( &
-        erf( real( (mv_logEpkzMin-mv_LogEpkzGivenLogLiso%avg)*mv_LogEpkzGivenLogLiso%invStdSqrt2 , kind=SPR ) ) - &
-        erf( real( (mv_logEpkzMax-mv_LogEpkzGivenLogLiso%avg)*mv_LogEpkzGivenLogLiso%invStdSqrt2 , kind=SPR ) ) ) )
+        erf( real( (mv_logEpkzMin-mv_LogEpkzGivenLogLiso%avg)*mv_LogEpkzGivenLogLiso%invStdSqrt2 , kind=ERFK ) ) - &
+        erf( real( (mv_logEpkzMax-mv_LogEpkzGivenLogLiso%avg)*mv_LogEpkzGivenLogLiso%invStdSqrt2 , kind=ERFK ) ) ) )
 
         modelIntOverLogEpkzGivenLogLisoZ = modelIntOverLogEpkzGivenLogLisoZ &
                                          * mv_logLisoInvStdSqrt2pi &
@@ -454,13 +498,13 @@ contains
 !***********************************************************************************************************************************
 
     pure function getProbEpkzGivenLiso(logEpkz) result(probEpkzGivenLiso)
-        use Constants_mod, only: RK, SPR
+        use Constants_mod, only: RK
         use Batse_mod, only: getLogPF53
         implicit none
         real(RK), intent(in)    :: logEpkz
         real(RK)                :: probEpkzGivenLiso, normedLogPF53, efficiency
         normedLogPF53 = (getLogPF53(logEpkz-mv_logZone,mv_logPbol)-mv_Thresh%avg)*mv_Thresh%invStdSqrt2
-        efficiency = 0.5_RK + 0.5_RK * erf(real(normedLogPF53,kind=SPR))
+        efficiency = 0.5_RK + 0.5_RK * erf(real(normedLogPF53,kind=ERFK))
         probEpkzGivenLiso   = efficiency * mv_LogEpkzGivenLogLiso%invStdSqrt2pi &
                             * exp( -( (logEpkz-mv_LogEpkzGivenLogLiso%avg)*mv_LogEpkzGivenLogLiso%invStdSqrt2)**2 )
     end function getProbEpkzGivenLiso
@@ -506,18 +550,18 @@ contains
 !***********************************************************************************************************************************
 
     pure function getBatseEfficiency(normedLogPF53) result(batseEfficiency)
-        use Constants_mod, only: RK, SPR
+        use Constants_mod, only: RK
         implicit none
         real(RK), intent(in) :: normedLogPF53
         real(RK)             :: batseEfficiency
-        batseEfficiency = 0.5_RK + 0.5_RK * erf( real( normedLogPF53 , kind=SPR ) )
+        batseEfficiency = 0.5_RK + 0.5_RK * erf( real( normedLogPF53 , kind=ERFK ) )
     end function getBatseEfficiency
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
 
     pure function getBatseEfficiencyApprox(logEpk,logPbol) result(batseEfficiency)
-        use Constants_mod, only: RK, SPR
+        use Constants_mod, only: RK
         use Batse_mod, only: getLogPF53
         implicit none
         real(RK), intent(in) :: logEpk,logPbol
@@ -527,7 +571,7 @@ contains
             batseEfficiency = 0._RK
         elseif ( logPbol < mv_Thresh%logPbolMax ) then
             normedLogPF53 = ( getLogPF53(logEpk,logPbol) - mv_Thresh%avg ) * mv_Thresh%invStdSqrt2
-            batseEfficiency = 0.5_RK + 0.5_RK * erf( real( normedLogPF53 , kind=SPR ) )
+            batseEfficiency = 0.5_RK + 0.5_RK * erf( real( normedLogPF53 , kind=ERFK ) )
         elseif ( logPbol >= mv_Thresh%logPbolMax ) then
             batseEfficiency = 1._RK
         end if

@@ -96,6 +96,7 @@ KFACTOR_CORRECTION="onethird"
 INTEGRATION_METHOD="romberg"
 RATE_DENSITY_MODEL="B10"
 FOR_COARRAY_NUM_IMAGES=3
+ERR_ESTIMATION_ENABLED=false
 
 usage()
 {
@@ -131,6 +132,8 @@ system when ParaMonte is built via its provided build scripts at the root of its
                                 : will be run: positive integer. If not provided, the default is 3.
         -p | --pmlib            : The path to the root of the specific ParaMonte library build.
                                 : This root folder must contain the three lib,mod,obj folders.
+        -e | --errtest          : if provided, error estimation testings will be performed instead of real simulation.
+                                : Note that this option will automatically set the integration method to romberg.
         -h | --help             : help with the sctipt usage
 
 NOTE: ALL FLAGS ARE OPTIONAL. If not provided, appropriate values will be set for each missing flag.
@@ -158,6 +161,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -n | --num_images )     shift
                                 FOR_COARRAY_NUM_IMAGES=$1
+                                ;;
+        -e | --errtest )        ERR_ESTIMATION_ENABLED=true
                                 ;;
         -h | --help )           usage
                                 exit
@@ -233,6 +238,12 @@ else
 fi
 export KFACTOR_CORRECTION
 echo >&2 "-- ${BUILD_NAME} - KFACTOR_CORRECTION: ${KFACTOR_CORRECTION}"
+
+# set error estimation mode vs real simulation
+if [ "${ERR_ESTIMATION_ENABLED}" = "true" ]; then
+    INTEGRATION_METHOD=romberg
+    echo >&2 "-- ${BUILD_NAME} - ERR_ESTIMATION_ENABLED: ${ERR_ESTIMATION_ENABLED}"
+fi
 
 # set integration methodology: quadpackDPR, quadpackSPR, romberg
 
@@ -446,6 +457,8 @@ if [ "${CFI_ENABLED}" = "true" ]; then FPP_FLAGS="${FPP_FLAGS} -DCFI_ENABLED"; f
 if [ "${CAF_ENABLED}" = "true" ]; then FPP_FLAGS="${FPP_FLAGS} -DCAF_ENABLED"; fi
 if [ "${MPI_ENABLED}" = "true" ]; then FPP_FLAGS="${FPP_FLAGS} -DMPI_ENABLED"; fi
 
+if [ "${ERR_ESTIMATION_ENABLED}" = "true" ]; then FPP_FLAGS="${FPP_FLAGS} -DERR_ESTIMATION_ENABLED"; fi
+
 # add Kfactor correction and SFR macros
 
 FPP_FLAGS="${FPP_FLAGS} -D${KFACTOR_CORRECTION}"
@@ -515,7 +528,7 @@ echo >&2 "-- ${BUILD_NAME} - compiling ${BUILD_NAME} with ${COMPILER_NAME}"
 cd "${CosmicRate_OBJ_DIR}"
 for SRC_FILE in ${SRC_FILE_LIST}
 do
-    echo >&2 "-- ${BUILD_NAME} - ${COMPILER_NAME} ${COMPILER_FLAGS} ${CosmicRate_SRC_DIR}/${SRC_FILE} -c"
+    echo >&2 "-- ${BUILD_NAME} - ${COMPILER_NAME} ${COMPILER_FLAGS} ${FPP_FLAGS} ${CosmicRate_SRC_DIR}/${SRC_FILE} -c"
     ${COMPILER_NAME} ${COMPILER_FLAGS} ${FPP_FLAGS} \
     -module "${CosmicRate_MOD_DIR}" \
     -I"${CosmicRate_MOD_DIR}" \
@@ -576,8 +589,20 @@ if [ $? -eq 0 ]; then
     echo >&2 "-- ${BUILD_NAME} -   to: ${CosmicRate_BIN_DIR}/in/"
     cp "${CosmicRate_ROOT_PATH}/in/${BATSE_DATA_FILE_NAME}" "${CosmicRate_BIN_DIR}/in/"
     echo >&2
+    echo >&2 "-- ${BUILD_NAME} - copying slurm.sh to the executable's directory"
+    echo >&2 "-- ${BUILD_NAME} - from: ${CosmicRate_ROOT_PATH}/slurm.sh"
+    echo >&2 "-- ${BUILD_NAME} -   to: ${CosmicRate_BIN_DIR}/"
+    cp "${CosmicRate_ROOT_PATH}/slurm.sh" "${CosmicRate_BIN_DIR}/"
+    echo >&2
+    if [ "${ERR_ESTIMATION_ENABLED}" = "true" ]; then
+    echo >&2 "-- ${BUILD_NAME} - copying BATSE data to the executable's directory"
+    echo >&2 "-- ${BUILD_NAME} - from: ${CosmicRate_ROOT_PATH}/in/errEsimationParams.txt"
+    echo >&2 "-- ${BUILD_NAME} -   to: ${CosmicRate_BIN_DIR}/in/"
+    cp "${CosmicRate_ROOT_PATH}/in/errEsimationParams.txt" "${CosmicRate_BIN_DIR}/in/"
+    echo >&2
+    fi
 
-    EXE_NAME_WITH_OPTIONS="./${EXE_NAME} ./in/ ${INPUT_SPEC_FILE_NAME}"
+    EXE_NAME_WITH_OPTIONS="./${EXE_NAME} ${CosmicRate_BIN_DIR}/in/ ${INPUT_SPEC_FILE_NAME}"
 
     {
     echo "# ${BUILD_NAME} runtime setup script."
@@ -648,7 +673,7 @@ if [ $? -eq 0 ]; then
     echo "" >> ${RUN_FILE_NAME}
     echo "chmod +x ${EXE_NAME}" >> ${RUN_FILE_NAME}
     if [ "${MPI_ENABLED}" = "true" ]; then
-        echo "mpiexec -np \${FOR_COARRAY_NUM_IMAGES} ${EXE_NAME_WITH_OPTIONS}" >> ${RUN_FILE_NAME}
+        echo "ibrun -np \${FOR_COARRAY_NUM_IMAGES} ${EXE_NAME_WITH_OPTIONS}" >> ${RUN_FILE_NAME}
         echo "" >> ${RUN_FILE_NAME}
     else
         if [ "${CAF_ENABLED}" = "true" ]; then

@@ -9,9 +9,9 @@
     zoneMax  = 2.1e1
     zoneTol  = 5.e-5
     lisoTol  = 5.e-6
-    epkzTol  = 1.e-6
-    zoneRef = 4
-    lisoRef = 5
+    epkzTol  = 1.e-7
+    zoneRef = 5
+    lisoRef = 6
     epkzRef = 7
 
 /
@@ -23,11 +23,11 @@
     description                         = "ParaDRAM sampling of the LGRB world model of BATSE 1366 LGRBs,\nwith redshift Kfactor corrections to the T90 durations
                                         \n zoneMin  = 1.1e0
                                         \n zoneMax  = 2.1e1
-                                        \n zoneTol  = 1.e-3
-                                        \n lisoTol  = 1.e-5
-                                        \n epkzTol  = 1.e-6
-                                        \n zoneRef = 4
-                                        \n lisoRef = 5
+                                        \n zoneTol  = 5.e-5
+                                        \n lisoTol  = 5.e-6
+                                        \n epkzTol  = 1.e-7
+                                        \n zoneRef = 5
+                                        \n lisoRef = 6
                                         \n epkzRef = 7
                                         "
    !outputColumnWidth                   = 25
@@ -67,7 +67,7 @@
 
     ! MCMC
 
-    chainSize                           = 10000
+    chainSize                           = 100000
     sampleRefinementCount               = 10
     sampleRefinementMethod              = "BatchMeans"
     randomStartPointDomainLowerLimitVec = 16*-1.e300
@@ -95,7 +95,7 @@
 
     ! DRAM
 
-    scaleFactor                         = "2*gelman",
+    scaleFactor                         = "1.5*gelman",
     proposalModel                       = "normal"
     adaptiveUpdateCount                 = 2000000000
    !adaptiveUpdatePeriod                = 35
