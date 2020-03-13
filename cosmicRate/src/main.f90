@@ -27,7 +27,7 @@ if (CmdArg%count/=2) then
     write(output_unit,"(*(g0))")
     write(output_unit,"(*(g0))") "FATAL: Invalid number of command-line arguments: ", CmdArg%count
     write(output_unit,"(*(g0))") "       Use the following example syntax to invoke the program: "
-    write(output_unit,"(*(g0))") "       a.exe <input file path: ../in/> <input file name: WorldModelSimualtionLGRB.nml>"
+    write(output_unit,"(*(g0))") "       a.exe <input file path: ./in/> <input file name: WorldModelSimualtionLGRB.nml>"
 end if
 
 ! read simulation input data

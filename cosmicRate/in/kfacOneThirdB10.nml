@@ -37,8 +37,8 @@
     sampleSize                          = 5000
     randomSeed                          = 3597,
     chainFileFormat                     = "compact"
-    domainLowerLimitVec                 = 4*-1.e300
-    domainUpperLimitVec                 = 4*1.e300
+   !domainLowerLimitVec                 = 16*-1.e300
+   !domainUpperLimitVec                 = 16*1.e300
     parallelizationModel                = "single chain"
    !targetAcceptanceRate                = 0.1e0
     progressReportPeriod                = 1000

@@ -110,7 +110,7 @@ system when ParaMonte is built via its provided build scripts at the root of its
     usage:
 
         buildCosmicRate.sh \
-        --ratedensity <The Rate Density Model: H06/L08/B10/M14> \
+        --ratedensity <The Rate Density Model: H06/L08/B10/M14/M17> \
         --kfac <kfactor correction model for durations: none,onethird> \
         --pmlib <path to the root of the ParaMonte library build> \
         --quad <quadrature method: romberg/quadpackSPR/quadpackDPR> \
@@ -123,7 +123,7 @@ system when ParaMonte is built via its provided build scripts at the root of its
     flag definitions:
 
         -r | --ratedensity      : The GRB Rate Density model to be used
-                                : possible values: H06/L08/B10/M14
+                                : possible values: H06/L08/B10/M14/M17
         -k | --kfac             : The kfactor corrections to the observed durations.
                                 : If not provided, the default value will be set to onethird.
         -q | --quad             : The quadrature method. possible values: romberg/quadpackSPR/quadpackDPR

@@ -31,8 +31,8 @@ module BatseLgrbWorldModel_mod
     ! *********************************************
 
     integer(IK) , parameter :: ERFK = RK    ! the real kind of the input value to erf()
-    integer(IK) , parameter :: NVAR = 4     ! number of GRB attributes used in the world model
-    integer(IK) , parameter :: NPAR = 16    ! number of world model's parameters
+    integer(IK) , parameter :: NVAR = 4_IK  ! number of GRB attributes used in the world model
+    integer(IK) , parameter :: NPAR = 16_IK ! number of world model's parameters
 
     ! the normalization factor of the multivariate log-normal distribution
 
