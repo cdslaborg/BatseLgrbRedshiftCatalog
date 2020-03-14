@@ -10,6 +10,8 @@ module BatseLgrbWorldModel_mod
     use StarFormation_mod, only: getLogRate => getLogRateM14
 #elif defined M17
     use StarFormation_mod, only: getLogRate => getLogRateM17
+#elif defined F18
+    use StarFormation_mod, only: getLogRate => getLogRateF18
 #else
 #error "Unknown SFR model in BatseLgrbWorldModel_mod.f90"
 #endif
