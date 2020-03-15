@@ -98,7 +98,9 @@ module BatseLgrbWorldModel_mod
     real(RK)        :: mv_logLisoLogPbolDiff ! this is log10(4*pi*dl^2) where dl is luminosity distance in units of mpc
     real(RK)        :: mv_logZone, mv_logEpkzMin, mv_logEpkzMax, mv_logPbol
     real(RK)        :: mv_logLisoInvStdSqrt2, mv_logLisoInvStdSqrt2pi
-    integer(IK)     :: mv_igrb ! index for referencing GRBs in the computation of logPostProb
+    integer(IK)     :: mv_igrb              ! index for referencing GRBs in the computation of logPostProb
+    integer(IK)     :: mv_counter = 0_IK    ! counter counting how many times the function is called
+    integer(IK)     :: mv_ierr = 0_IK       ! flag indicating whether a lack-of-convergence error has occurred in integrations.
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
@@ -146,6 +148,9 @@ contains
         integer(IK)             :: iwork(limit)
         real(RK)                :: work(lenw)
 #endif
+
+        mv_ierr = 0_IK
+        mv_counter = mv_counter + 1_IK
 
         ! mean and standard deviations
 
@@ -240,8 +245,8 @@ contains
                     , iwork         = iwork                         &
                     , work          = work                          &
                     )
-        if (ierr/=0) then
-            write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing model integral over redshift. ierr, neval = ", ierr, neval
+        if (mv_ierr .or. ierr/=0_IK) then
+            write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing model integral over redshift. ierr, neval = ", mv_ierr, neval
             error stop
         end if
 #elif defined quadpackSPR
@@ -256,8 +261,8 @@ contains
                     , neval         = neval                         &
                     , ier           = ierr                          &
                     )
-        if (ierr/=0) then
-            write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing model integral over redshift. ierr=",ierr
+        if (mv_ierr .or. ierr/=0_IK) then
+            write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing model integral over redshift. ierr=", mv_ierr
             error stop
         end if
 #else
@@ -284,9 +289,12 @@ contains
                             , ierr              = ierr                          &
                             )
         !write(*,*) "Zone: ", neval, relerr / modelint
-        if (ierr/=0) then
-            write(output_unit,"(*(g0))") ErrorMessage(ierr)
-            error stop
+        if (mv_ierr/=0_IK .or. ierr/=0_IK) then
+            if (ierr/=0_IK) write(output_unit,"(*(g0))") ErrorMessage(ierr)
+            write(divergence_unit,"(*(g0,:,','))") "getModelIntOverLogLisoGivenZ", zoneMin, zoneMax, modelint, relerr, neval
+            logPostProb = NEGINF_RK
+            return
+            !error stop
         end if
 #ifdef ERR_ESTIMATION_ENABLED
         zone_neval  = neval
@@ -295,7 +303,10 @@ contains
 #endif
         if (modelint<=0.0_RK) then
             write(output_unit,"(*(g0))") "model_integral (variable modelint in getLogPostProb.f90) is non-positive: ", modelint
-            error stop
+            write(divergence_unit,"(*(g0,:,','))") "nonPositiveModelint", zoneMin, zoneMax, modelint, relerr, neval
+            logPostProb = NEGINF_RK
+            return
+            !error stop
         end if
 
         ! marginalize over all possible redshifts
@@ -320,8 +331,8 @@ contains
                         , iwork         = iwork         &
                         , work          = work          &
                         )
-            if (ierr/=0) then
-                write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing probGRB. ierr=", ierr
+            if (mv_ierr/=0_IK .or. ierr/=0_IK) then
+                write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing probGRB. ierr=", mv_ierr, ierr
                 error stop
             end if
 #elif defined quadpackSPR
@@ -336,8 +347,8 @@ contains
                         , neval         = neval         &
                         , ier           = ierr          &
                         )
-            if (ierr/=0) then
-                write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing probGRB. ierr=", ierr
+            if (mv_ierr/=0_IK .or. ierr/=0_IK) then
+                write(output_unit,"(*(g0))") "FATAL: @qag(): error occurred while computing probGRB. ierr=", mv_ierr, ierr
                 error stop
             end if
 #else
@@ -353,9 +364,12 @@ contains
                                 , ierr              = ierr          &
                                 )
             !write(*,*) "Zone, ith GRB: ", mv_igrb, neval, relerr / probGRB
-            if (ierr/=0) then
-                write(output_unit,"(*(g0))") ErrorMessage(ierr)
-                error stop
+            if (mv_ierr/=0_IK .or. ierr/=0_IK) then
+                if (ierr/=0_IK) write(output_unit,"(*(g0))") ErrorMessage(ierr)
+                write(divergence_unit,"(*(g0,:,','))") "getProbGRB", zoneMin, zoneMax, probGRB, relerr, neval
+                logPostProb = NEGINF_RK
+                return
+                !error stop
             end if
 #ifdef ERR_ESTIMATION_ENABLED
         zgrb_count  = zgrb_count + 1_IK
@@ -365,8 +379,10 @@ contains
 #endif
             if (probGRB<=0.0_RK) then
                 !write(output_unit,"(*(g0))") "WARNING: probGRB <= 0.0_RK: ", probGRB, ". Setting logPostProb = NEGINF_RK ..."
+                write(divergence_unit,"(*(g0,:,','))") "nonPositiveProbGRB", zoneMin, zoneMax, probGRB, relerr, neval
                 logPostProb = NEGINF_RK
-                exit loopLogPostProb
+                return
+                !exit loopLogPostProb
             end if
             logPostProb = logPostProb + log( probGRB / (modelint*normFac) )
         end do loopLogPostProb
@@ -400,7 +416,12 @@ contains
         real(RK)                :: relerr
         real(RK)                :: modelIntOverLogLisoGivenZ
         real(RK)                :: twiceLogLumDisMpc, logLisoAtFullEfficiency
-        integer(IK)             :: ierr, neval
+        integer(IK)             :: neval
+
+        if (mv_ierr/=0) then
+            modelIntOverLogLisoGivenZ = NEGINF_RK
+            return
+        end if
 
         mv_logZone = log(zone)
         twiceLogLumDisMpc = 2 * getLogLumDisWicMpc(zone)
@@ -420,16 +441,23 @@ contains
                                 , integral          = modelIntOverLogLisoGivenZ                     &
                                 , relativeError     = relerr                                        &
                                 , numFuncEval       = neval                                         &
-                                , ierr              = ierr                                          &
+                                , ierr              = mv_ierr                                       &
                                 )
 #ifdef ERR_ESTIMATION_ENABLED
         liso_count  = liso_count + 1_IK
         liso_neval  = liso_neval + neval
         liso_relerr = liso_relerr + abs(relerr) / modelIntOverLogLisoGivenZ
 #endif
-        if (ierr/=0) then
-            write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(ierr)
-            error stop
+        if (mv_ierr/=0) then
+            write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(mv_ierr)
+            write(divergence_unit,"(*(g0,:,','))"   ) "getModelIntOverLogEpkzGivenLogLisoZ" &
+                                                    , mv_Thresh%logPbolMin + mv_logLisoLogPbolDiff &
+                                                    , logLisoAtFullEfficiency &
+                                                    , modelIntOverLogLisoGivenZ &
+                                                    , relerr, neval
+            modelIntOverLogLisoGivenZ = NEGINF_RK
+            return
+            !error stop
         end if
 
         ! add the analytical integral of the logLiso range within which BATSE efficiency is 100%
@@ -457,7 +485,12 @@ contains
         real(RK), intent(in)    :: logLiso
         real(RK)                :: modelIntOverLogEpkzGivenLogLisoZ
         real(RK)                :: relerr
-        integer(IK)             :: ierr, neval
+        integer(IK)             :: neval
+
+        if (mv_ierr/=0) then
+            modelIntOverLogEpkzGivenLogLisoZ = NEGINF_RK
+            return
+        end if
 
         mv_LogEpkzGivenLogLiso%avg = mv_LogEpkzGivenLogLiso%bias + mv_LogEpkzGivenLogLiso%tilt*logLiso
         mv_logPbol = logLiso - mv_logLisoLogPbolDiff
@@ -469,16 +502,23 @@ contains
                                 , integral          =  modelIntOverLogEpkzGivenLogLisoZ &
                                 , relativeError     =  relerr                           &
                                 , numFuncEval       =  neval                            &
-                                , ierr              =  ierr                             &
+                                , ierr              =  mv_ierr                          &
                                 )
 #ifdef ERR_ESTIMATION_ENABLED
         epkz_count  = epkz_count + 1_IK
         epkz_neval  = epkz_neval + neval
         epkz_relerr = epkz_relerr + abs(relerr) / modelIntOverLogEpkzGivenLogLisoZ
 #endif
-        if (ierr/=0) then
-            write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(ierr)
-            error stop
+        if (mv_ierr/=0) then
+            write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(mv_ierr)
+            write(divergence_unit,"(*(g0,:,','))"   ) "getProbEpkzGivenLiso" &
+                                                    , mv_logEpkzMin &
+                                                    , mv_logEpkzMax &
+                                                    , modelIntOverLogEpkzGivenLogLisoZ &
+                                                    , relerr, neval
+            modelIntOverLogEpkzGivenLogLisoZ = NEGINF_RK
+            return
+            !error stop
         end if
 
         ! add integral of the tails of the conditional logEpkz distribution given mv_logLiso
