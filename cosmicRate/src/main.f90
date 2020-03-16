@@ -3,7 +3,6 @@ program batseWorldModelSimualtion
 use, intrinsic :: iso_fortran_env, only: output_unit
 use Batse_mod, only: readDataGRB
 use System_mod, only: CmdArg_type
-use String_mod, only: num2str
 use Constants_mod, only: IK, RK
 use BatseLgrbWorldModel_mod, only: NPAR, getLogPostProb
 use BatseLgrbWorldModel_mod, only: zoneMin, zoneMax

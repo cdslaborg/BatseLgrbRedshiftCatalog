@@ -629,6 +629,7 @@ contains
 
     ! create the error-catching report file
     function getErrFileUnit() result(errFileUnit)
+        use String_mod, only: num2str
         implicit none
         integer(IK) :: errFileUnit
         integer(IK), save :: imageID = 1_IK, imageCount = 1_IK, dummyFileUnit = 1_IK
