@@ -14,7 +14,6 @@ use BatseLgrbWorldModel_mod, only: mv_divergenceFileUnit
 implicit none
 
 integer(IK)                 :: i, j, inFileUnit, ngrb
-integer(IK)                 :: imageID = 1_IK, imageCount = 1_IK
 character(:), allocatable   :: inputBatseDataFile, outputBatseDataFile
 type(CmdArg_type)           :: CmdArg
 
@@ -51,23 +50,6 @@ call readDataGRB( inputBatseDataFile    &
                 , outputBatseDataFile   &
                 , isLgrb = .true.       &
                 )
-
-! create the error-catching report file
-#if defined MPI_ENABLED
-block
-    use mpi
-    integer(IK) :: ierrMPI
-    logical     :: isInitialized
-    call mpi_initialized( isInitialized, ierrMPI )
-    if (.not. isInitialized) call mpi_init(ierrMPI)
-    call mpi_comm_rank(mpi_comm_world, imageID, ierrMPI)
-    call mpi_comm_size(mpi_comm_world, imageCount, ierrMPI)
-    imageID = imageID + 1_IK ! make the ranks consistent with Fortran coarray indexing conventions
-end block
-#endif
-
-open(unit=mv_divergenceFileUnit,file="divergenceErrorReport_"//num2str(imageID)//".txt",status="replace")
-write(mv_divergenceFileUnit,"(*(g0,:,','))" ) "errorLocation", "integrationLowerLimit", "integrationUpperLimit", "integrationResult", "relerr", "neval", "MCMCStep"
 
 #ifdef ERR_ESTIMATION_ENABLED
 
@@ -196,7 +178,5 @@ end block blockSampling
 !***********************************************************************************************************************************
 
 #endif
-
-close(mv_divergenceFileUnit)
 
 end program batseWorldModelSimualtion

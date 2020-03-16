@@ -103,7 +103,6 @@ module BatseLgrbWorldModel_mod
     integer(IK)     :: mv_igrb                  ! index for referencing GRBs in the computation of logPostProb
     integer(IK)     :: mv_counter = 0_IK        ! counter counting how many times the function is called
     integer(IK)     :: mv_ierr = 0_IK           ! flag indicating whether a lack-of-convergence error has occurred in integrations.
-    integer(IK)     :: mv_divergenceFileUnit
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
@@ -295,7 +294,7 @@ contains
         if (mv_ierr/=0_IK .or. ierr/=0_IK) then
             if (ierr/=0_IK) mv_ierr = ierr
             write(output_unit,"(*(g0))") ErrorMessage(mv_ierr)
-            write(mv_divergenceFileUnit,"(*(g0,:,','))") "getModelIntOverLogLisoGivenZ", zoneMin, zoneMax, modelint, relerr, neval, mv_counter
+            write(getErrFileUnit(),"(*(g0,:,','))") "getModelIntOverLogLisoGivenZ", zoneMin, zoneMax, modelint, relerr, neval, mv_counter
             logPostProb = NEGINF_RK
             return
             !error stop
@@ -307,7 +306,7 @@ contains
 #endif
         if (modelint<=0.0_RK) then
             write(output_unit,"(*(g0))") "model_integral (variable modelint in getLogPostProb.f90) is non-positive: ", modelint
-            write(mv_divergenceFileUnit,"(*(g0,:,','))") "nonPositiveModelint", zoneMin, zoneMax, modelint, relerr, neval, mv_counter
+            write(getErrFileUnit(),"(*(g0,:,','))") "nonPositiveModelint", zoneMin, zoneMax, modelint, relerr, neval, mv_counter
             logPostProb = NEGINF_RK
             return
             !error stop
@@ -371,7 +370,7 @@ contains
             if (mv_ierr/=0_IK .or. ierr/=0_IK) then
                 if (ierr/=0_IK) mv_ierr = ierr
                 write(output_unit,"(*(g0))") ErrorMessage(mv_ierr)
-                write(mv_divergenceFileUnit,"(*(g0,:,','))") "getProbGRB", zoneMin, zoneMax, probGRB, relerr, neval, mv_counter
+                write(getErrFileUnit(),"(*(g0,:,','))") "getProbGRB", zoneMin, zoneMax, probGRB, relerr, neval, mv_counter
                 logPostProb = NEGINF_RK
                 return
                 !error stop
@@ -384,7 +383,7 @@ contains
 #endif
             if (probGRB<=0.0_RK) then
                 !write(output_unit,"(*(g0))") "WARNING: probGRB <= 0.0_RK: ", probGRB, ". Setting logPostProb = NEGINF_RK ..."
-                write(mv_divergenceFileUnit,"(*(g0,:,','))") "nonPositiveProbGRB", zoneMin, zoneMax, probGRB, relerr, neval, mv_counter
+                write(getErrFileUnit(),"(*(g0,:,','))") "nonPositiveProbGRB", zoneMin, zoneMax, probGRB, relerr, neval, mv_counter
                 logPostProb = NEGINF_RK
                 return
                 !exit loopLogPostProb
@@ -456,7 +455,7 @@ contains
         if (ierr/=0_IK .or. mv_ierr/=0_IK) then
             if (ierr/=0_IK) mv_ierr = ierr
             write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(mv_ierr)
-            write(mv_divergenceFileUnit,"(*(g0,:,','))"   ) "getModelIntOverLogEpkzGivenLogLisoZ" &
+            write(getErrFileUnit(),"(*(g0,:,','))"   ) "getModelIntOverLogEpkzGivenLogLisoZ" &
                                                     , mv_Thresh%logPbolMin + mv_logLisoLogPbolDiff &
                                                     , logLisoAtFullEfficiency &
                                                     , modelIntOverLogLisoGivenZ &
@@ -517,7 +516,7 @@ contains
 #endif
         if (mv_ierr/=0_IK) then
             write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(mv_ierr)
-            write(mv_divergenceFileUnit,"(*(g0,:,','))"   ) "getProbEpkzGivenLiso" &
+            write(getErrFileUnit(),"(*(g0,:,','))"   ) "getProbEpkzGivenLiso" &
                                                     , mv_logEpkzMin &
                                                     , mv_logEpkzMax &
                                                     , modelIntOverLogEpkzGivenLogLisoZ &
@@ -625,6 +624,37 @@ contains
         end if
     end function getBatseEfficiencyApprox
 
+!***********************************************************************************************************************************
+!***********************************************************************************************************************************
+
+    ! create the error-catching report file
+    function getErrFileUnit() result(errFileUnit)
+        implicit none
+        integer(IK) :: errFileUnit
+        integer(IK), save :: imageID = 1_IK, imageCount = 1_IK, dummyFileUnit = 1_IK
+        if (dummyFileUnit>0_IK) then
+#if defined MPI_ENABLED
+            block
+                use mpi
+                integer(IK) :: ierrMPI
+                logical     :: isInitialized
+                call mpi_initialized( isInitialized, ierrMPI )
+                if (.not. isInitialized) call mpi_init(ierrMPI)
+                call mpi_comm_rank(mpi_comm_world, imageID, ierrMPI)
+                call mpi_comm_size(mpi_comm_world, imageCount, ierrMPI)
+                imageID = imageID + 1_IK ! make the ranks consistent with Fortran coarray indexing conventions
+            end block
+#endif
+            open(newunit=dummyFileUnit,file="divergenceErrorReport_"//num2str(imageID)//".txt",status="replace")
+            write(dummyFileUnit,"(*(g0,:,','))" ) "errorLocation", "integrationLowerLimit", "integrationUpperLimit", "integrationResult", "relerr", "neval", "MCMCStep"
+        end if
+        errFileUnit = dummyFileUnit
+    end function getErrFileUnit
+
+!***********************************************************************************************************************************
+!***********************************************************************************************************************************
+
+        !close(errFileUnit)
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
 

@@ -7,11 +7,11 @@
 
     zoneMin  = 1.1e0
     zoneMax  = 2.1e1
-    zoneTol  = 1.e-3
-    lisoTol  = 5.e-5
-    epkzTol  = 1.e-6
-    zoneRef = 4
-    lisoRef = 5
+    zoneTol  = 5.e-5
+    lisoTol  = 5.e-6
+    epkzTol  = 1.e-7
+    zoneRef = 5
+    lisoRef = 6
     epkzRef = 7
 
 /
@@ -23,24 +23,24 @@
     description                         = "ParaDRAM sampling of the LGRB world model of BATSE 1366 LGRBs,\nwith redshift Kfactor corrections to the T90 durations
                                         \n zoneMin  = 1.1e0
                                         \n zoneMax  = 2.1e1
-                                        \n zoneTol  = 1.e-3
-                                        \n lisoTol  = 5.e-5
-                                        \n epkzTol  = 1.e-6
-                                        \n zoneRef = 4
-                                        \n lisoRef = 5
+                                        \n zoneTol  = 5.e-5
+                                        \n lisoTol  = 5.e-6
+                                        \n epkzTol  = 1.e-7
+                                        \n zoneRef = 5
+                                        \n lisoRef = 6
                                         \n epkzRef = 7
                                         "
    !outputColumnWidth                   = 25
     outputRealPrecision                 = 17
    !outputDelimiter                     = ","
     outputFileName                      = "./out/"
-    sampleSize                          = 2500
-    randomSeed                          = 2136275,
+    sampleSize                          = 5000
+    randomSeed                          = 3597,
     chainFileFormat                     = "compact"
-    domainLowerLimitVec                 = 4*-1.e300
-    domainUpperLimitVec                 = 4*1.e300
+   !domainLowerLimitVec                 = 16*-1.e300
+   !domainUpperLimitVec                 = 16*1.e300
     parallelizationModel                = "single chain"
-    targetAcceptanceRate                = 0.23e0
+   !targetAcceptanceRate                = 0.1e0
     progressReportPeriod                = 1000
     maxNumDomainCheckToWarn             = 100
     maxNumDomainCheckToStop             = 1000
@@ -67,7 +67,7 @@
 
     ! MCMC
 
-    chainSize                           = 100000
+    chainSize                           = 200000
     sampleRefinementCount               = 10
     sampleRefinementMethod              = "BatchMeans"
     randomStartPointDomainLowerLimitVec = 16*-1.e300
@@ -75,6 +75,7 @@
     randomStartPointRequested           = false
 
     startPointVec = 
+
     118.488330000000
     5.63810715000000
     119.538610000000
@@ -94,16 +95,17 @@
 
     ! DRAM
 
-    scaleFactor                         = "2*gelman",
+    scaleFactor                         = "1.5*gelman",
     proposalModel                       = "normal"
-    adaptiveUpdateCount                 = 10000000
-    adaptiveUpdatePeriod                = 35
+    adaptiveUpdateCount                 = 2000000000
+   !adaptiveUpdatePeriod                = 35
     greedyAdaptationCount               = 0
    !delayedRejectionCount               = 5
    !delayedRejectionScaleFactorVec      = 5*1.
    !burninAdaptationMeasure             = 1.
 
     proposalStartStdVec = 
+
     0.387770435106835
     0.109060146803281
     0.400513637197473
