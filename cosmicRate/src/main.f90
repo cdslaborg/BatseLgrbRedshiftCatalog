@@ -8,7 +8,6 @@ use BatseLgrbWorldModel_mod, only: NPAR, getLogPostProb
 use BatseLgrbWorldModel_mod, only: zoneMin, zoneMax
 use BatseLgrbWorldModel_mod, only: zoneTol, lisoTol, epkzTol
 use BatseLgrbWorldModel_mod, only: zoneRef, lisoRef, epkzRef
-use BatseLgrbWorldModel_mod, only: mv_divergenceFileUnit
 
 implicit none
 
