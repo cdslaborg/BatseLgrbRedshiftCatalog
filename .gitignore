@@ -119,6 +119,7 @@ Thumbs.db
 *_report.txt
 *_restart.txt
 *.stderr
+*.err
 *.temp
 *.rfn
 ___*___.*
