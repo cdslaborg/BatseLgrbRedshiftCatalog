@@ -1,9 +1,0 @@
-
-Currently Loaded Modules:
-  1) intel/18.0.2      4) git/2.9.0        7) cmake/3.16.1
-  2) libfabric/1.7.0   5) autotools/1.1    8) xalt/2.7.9
-  3) impi/18.0.2       6) python2/2.7.15   9) TACC
-
- 
-
-/tmp/slurmd/job5385982/slurm_script: line 46: ./run.sh: No such file or directory
