@@ -97,12 +97,13 @@ module BatseLgrbWorldModel_mod
     real(RK)        :: mv_CholeskyLowerLogNormModel(NVAR,NVAR), mv_DiagonalLogNormModel(NVAR)
     real(RK)        :: mv_InvCovMatLogNormModel(NVAR,NVAR)
    
-    real(RK)        :: mv_logLisoLogPbolDiff ! this is log10(4*pi*dl^2) where dl is luminosity distance in units of mpc
+    real(RK)        :: mv_logLisoLogPbolDiff    ! this is log10(4*pi*dl^2) where dl is luminosity distance in units of mpc
     real(RK)        :: mv_logZone, mv_logEpkzMin, mv_logEpkzMax, mv_logPbol
     real(RK)        :: mv_logLisoInvStdSqrt2, mv_logLisoInvStdSqrt2pi
-    integer(IK)     :: mv_igrb              ! index for referencing GRBs in the computation of logPostProb
-    integer(IK)     :: mv_counter = 0_IK    ! counter counting how many times the function is called
-    integer(IK)     :: mv_ierr = 0_IK       ! flag indicating whether a lack-of-convergence error has occurred in integrations.
+    integer(IK)     :: mv_igrb                  ! index for referencing GRBs in the computation of logPostProb
+    integer(IK)     :: mv_counter = 0_IK        ! counter counting how many times the function is called
+    integer(IK)     :: mv_ierr = 0_IK           ! flag indicating whether a lack-of-convergence error has occurred in integrations.
+    integer(IK)     :: mv_divergenceFileUnit
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
@@ -292,8 +293,9 @@ contains
                             )
         !write(*,*) "Zone: ", neval, relerr / modelint
         if (mv_ierr/=0_IK .or. ierr/=0_IK) then
-            if (ierr/=0_IK) write(output_unit,"(*(g0))") ErrorMessage(ierr)
-            write(divergence_unit,"(*(g0,:,','))") "getModelIntOverLogLisoGivenZ", zoneMin, zoneMax, modelint, relerr, neval
+            if (ierr/=0_IK) mv_ierr = ierr
+            write(output_unit,"(*(g0))") ErrorMessage(mv_ierr)
+            write(mv_divergenceFileUnit,"(*(g0,:,','))") "getModelIntOverLogLisoGivenZ", zoneMin, zoneMax, modelint, relerr, neval, mv_counter
             logPostProb = NEGINF_RK
             return
             !error stop
@@ -305,7 +307,7 @@ contains
 #endif
         if (modelint<=0.0_RK) then
             write(output_unit,"(*(g0))") "model_integral (variable modelint in getLogPostProb.f90) is non-positive: ", modelint
-            write(divergence_unit,"(*(g0,:,','))") "nonPositiveModelint", zoneMin, zoneMax, modelint, relerr, neval
+            write(mv_divergenceFileUnit,"(*(g0,:,','))") "nonPositiveModelint", zoneMin, zoneMax, modelint, relerr, neval, mv_counter
             logPostProb = NEGINF_RK
             return
             !error stop
@@ -367,8 +369,9 @@ contains
                                 )
             !write(*,*) "Zone, ith GRB: ", mv_igrb, neval, relerr / probGRB
             if (mv_ierr/=0_IK .or. ierr/=0_IK) then
-                if (ierr/=0_IK) write(output_unit,"(*(g0))") ErrorMessage(ierr)
-                write(divergence_unit,"(*(g0,:,','))") "getProbGRB", zoneMin, zoneMax, probGRB, relerr, neval
+                if (ierr/=0_IK) mv_ierr = ierr
+                write(output_unit,"(*(g0))") ErrorMessage(mv_ierr)
+                write(mv_divergenceFileUnit,"(*(g0,:,','))") "getProbGRB", zoneMin, zoneMax, probGRB, relerr, neval, mv_counter
                 logPostProb = NEGINF_RK
                 return
                 !error stop
@@ -381,7 +384,7 @@ contains
 #endif
             if (probGRB<=0.0_RK) then
                 !write(output_unit,"(*(g0))") "WARNING: probGRB <= 0.0_RK: ", probGRB, ". Setting logPostProb = NEGINF_RK ..."
-                write(divergence_unit,"(*(g0,:,','))") "nonPositiveProbGRB", zoneMin, zoneMax, probGRB, relerr, neval
+                write(mv_divergenceFileUnit,"(*(g0,:,','))") "nonPositiveProbGRB", zoneMin, zoneMax, probGRB, relerr, neval, mv_counter
                 logPostProb = NEGINF_RK
                 return
                 !exit loopLogPostProb
@@ -418,9 +421,9 @@ contains
         real(RK)                :: relerr
         real(RK)                :: modelIntOverLogLisoGivenZ
         real(RK)                :: twiceLogLumDisMpc, logLisoAtFullEfficiency
-        integer(IK)             :: neval
+        integer(IK)             :: neval, ierr
 
-        if (mv_ierr/=0) then
+        if (mv_ierr/=0_IK) then
             modelIntOverLogLisoGivenZ = NEGINF_RK
             return
         end if
@@ -443,20 +446,21 @@ contains
                                 , integral          = modelIntOverLogLisoGivenZ                     &
                                 , relativeError     = relerr                                        &
                                 , numFuncEval       = neval                                         &
-                                , ierr              = mv_ierr                                       &
+                                , ierr              = ierr                                          &
                                 )
 #ifdef ERR_ESTIMATION_ENABLED
         liso_count  = liso_count + 1_IK
         liso_neval  = liso_neval + neval
         liso_relerr = liso_relerr + abs(relerr) / modelIntOverLogLisoGivenZ
 #endif
-        if (mv_ierr/=0) then
+        if (ierr/=0_IK .or. mv_ierr/=0_IK) then
+            if (ierr/=0_IK) mv_ierr = ierr
             write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(mv_ierr)
-            write(divergence_unit,"(*(g0,:,','))"   ) "getModelIntOverLogEpkzGivenLogLisoZ" &
+            write(mv_divergenceFileUnit,"(*(g0,:,','))"   ) "getModelIntOverLogEpkzGivenLogLisoZ" &
                                                     , mv_Thresh%logPbolMin + mv_logLisoLogPbolDiff &
                                                     , logLisoAtFullEfficiency &
                                                     , modelIntOverLogLisoGivenZ &
-                                                    , relerr, neval
+                                                    , relerr, neval, mv_counter
             modelIntOverLogLisoGivenZ = NEGINF_RK
             return
             !error stop
@@ -489,7 +493,7 @@ contains
         real(RK)                :: relerr
         integer(IK)             :: neval
 
-        if (mv_ierr/=0) then
+        if (mv_ierr/=0_IK) then
             modelIntOverLogEpkzGivenLogLisoZ = NEGINF_RK
             return
         end if
@@ -511,13 +515,13 @@ contains
         epkz_neval  = epkz_neval + neval
         epkz_relerr = epkz_relerr + abs(relerr) / modelIntOverLogEpkzGivenLogLisoZ
 #endif
-        if (mv_ierr/=0) then
+        if (mv_ierr/=0_IK) then
             write(output_unit,"(*(g0))") PROCEDURE_NAME // ErrorMessage(mv_ierr)
-            write(divergence_unit,"(*(g0,:,','))"   ) "getProbEpkzGivenLiso" &
+            write(mv_divergenceFileUnit,"(*(g0,:,','))"   ) "getProbEpkzGivenLiso" &
                                                     , mv_logEpkzMin &
                                                     , mv_logEpkzMax &
                                                     , modelIntOverLogEpkzGivenLogLisoZ &
-                                                    , relerr, neval
+                                                    , relerr, neval, mv_counter
             modelIntOverLogEpkzGivenLogLisoZ = NEGINF_RK
             return
             !error stop

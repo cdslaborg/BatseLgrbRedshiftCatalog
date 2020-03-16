@@ -8,6 +8,7 @@ use BatseLgrbWorldModel_mod, only: NPAR, getLogPostProb
 use BatseLgrbWorldModel_mod, only: zoneMin, zoneMax
 use BatseLgrbWorldModel_mod, only: zoneTol, lisoTol, epkzTol
 use BatseLgrbWorldModel_mod, only: zoneRef, lisoRef, epkzRef
+use BatseLgrbWorldModel_mod, only: mv_divergenceFileUnit
 
 implicit none
 
@@ -48,6 +49,10 @@ call readDataGRB( inputBatseDataFile    &
                 , outputBatseDataFile   &
                 , isLgrb = .true.       &
                 )
+
+! create the error-catching report file
+open(unit=mv_divergenceFileUnit,file="divergenceErrorReport.txt",status="replace")
+write(mv_divergenceFileUnit,"(*(g0,:,','))" ) "errorLocation", "integrationLowerLimit", "integrationUpperLimit", "integrationResult", "relerr", "neval", "MCMCStep"
 
 #ifdef ERR_ESTIMATION_ENABLED
 
@@ -176,5 +181,7 @@ end block blockSampling
 !***********************************************************************************************************************************
 
 #endif
+
+close(mv_divergenceFileUnit)
 
 end program batseWorldModelSimualtion
