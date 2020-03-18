@@ -53,10 +53,10 @@
                                         , avgLogEpkz
                                         , avgLogEiso
                                         , avgLogT90z
-                                        , stdLogLiso
-                                        , stdLogEpkz
-                                        , stdLogEiso
-                                        , stdLogT90z
+                                        , logStdLogLiso
+                                        , logStdLogEpkz
+                                        , logStdLogEiso
+                                        , logStdLogT90z
                                         , atanhCorLisoEpkz
                                         , atanhCorLisoEiso
                                         , atanhCorLisoT90z
@@ -64,7 +64,7 @@
                                         , atanhCorEpkzT90z
                                         , atanhCorEisoT90z
                                         , avgLogThresh
-                                        , stdLogThresh
+                                        , logStdLogThresh
 
     ! MCMC
 
