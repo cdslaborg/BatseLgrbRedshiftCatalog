@@ -23,12 +23,12 @@
 #
 #----------------------------------------------------
 
-#SBATCH -J cosmicRateM14        # Job name
-#SBATCH -o cosmicRateM14.%j.out # Name of stdout output file
-#SBATCH -e cosmicRateM14.%j.err # Name of stderr error file
+#SBATCH -J cosmicRate        # Job name
+#SBATCH -o cosmicRate.%j.out # Name of stdout output file
+#SBATCH -e cosmicRate.%j.err # Name of stderr error file
 #SBATCH -p skx-normal           # Queue (partition) name
 #SBATCH -N 1                    # Total # of nodes 
-#SBATCH -n 15                   # Total # of mpi tasks
+#SBATCH -n 48                   # Total # of mpi tasks
 #SBATCH -t 12:00:00             # Run time (hh:mm:ss)
 #SBATCH --mail-user=shahmoradi@utexas.edu
 #SBATCH --mail-type=all         # Send email at begin and end of job
@@ -43,6 +43,6 @@ date
 # Launch MPI code... 
 # Use ibrun instead of mpirun or mpiexec
 
-./run.sh -n 15
+./run.sh -n 48
 
 # ---------------------------------------------------

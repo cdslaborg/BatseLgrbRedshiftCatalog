@@ -20,7 +20,8 @@
 
     ! Base
 
-    description                         = "ParaDRAM sampling of the LGRB world model of BATSE 1366 LGRBs,\nwith redshift Kfactor corrections to the T90 durations
+    description                         = "ParaDRAM sampling of the LGRB world model of BATSE 1366 LGRBs,\nwith onethird K-factor redshift corrections to the T90 durations
+                                        \n assuming SFR H06 (of Hopkins and Beacom 2006)
                                         \n zoneMin  = 1.1e0
                                         \n zoneMax  = 2.1e1
                                         \n zoneTol  = 5.e-5
@@ -67,7 +68,7 @@
 
     ! MCMC
 
-    chainSize                           = 200000
+    chainSize                           = 150000
     sampleRefinementCount               = 10
     sampleRefinementMethod              = "BatchMeans"
     randomStartPointDomainLowerLimitVec = 16*-1.e300
