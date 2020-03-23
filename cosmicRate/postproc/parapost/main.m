@@ -24,6 +24,7 @@ Model.ID = {'H06', 'B10', 'M17', 'F18'}; %, 'L08'
 Model.count = length(Model.ID);
 
 figRequested = false;
+figDetEffRequested = true;
 paraPostReadRequested = false;
 figExportRequested = true;
 verboseRequested = true;
@@ -280,3 +281,77 @@ texTab{irow} = ['\end{table*}']; irow = irow + 1;
 fid = fopen([outDir,'tabParaPost.tex'],'w');
 fprintf(fid,'%s\n',texTab{:});
 fclose(fid);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% generate the latex table of parameter posterior PDF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if figDetEffRequested
+
+    fileName = [outDir,'BatseDetEff.png'];
+    disp('generating the BATSE efficiency plot: fileName ...');
+
+    DetEff4B = importdata('../../in/batseEfficiency4B.txt'); % Batse 4B catalog detection efficiency
+
+    detEffLegendLen = Model.count + 1;
+    detEffLegend = cell(detEffLegendLen,1);
+    detEffLegend{1} = 'BATSE Catalog';
+    for imodel = 1:detEffLegendLen-1
+        detEffLegend{imodel+1} = ['LGRB Rate: ',Model.ID{imodel}];
+    end
+
+    pphRange = [0.1 10];
+    DetEffSim.pph = pphRange(1) : 0.02 : pphRange(2);
+    DetEffSim.eff = zeros(length(DetEffSim.pph),detEffLegendLen-1);
+
+    for imodel = 1:Model.count
+        DetEffSim.eff(:,imodel) = 0.5 + 0.5 * erf( ( log10(DetEffSim.pph) - Model.(Model.ID{imodel}).stats.avg.avgLogThresh ) / ( Model.(Model.ID{imodel}).stats.avg.stdLogThresh*sqrt(2) ) );
+    end
+
+    if figExportRequested
+        figure('visible','off','Color','none');
+    else
+        figure('visible','on'); %,'Color','none');
+    end
+    hold on; box on; colormap('cool');
+
+        plot( DetEff4B.data(:,7) ...
+            , DetEff4B.data(:,9) ...
+            , ':', 'linewidth', 3 ...
+            , 'color', [0.5 0.5 0.5] ...
+            )
+
+        % reset MATLAB default color order
+        ax = gca;
+        ax.ColorOrderIndex = 1;
+
+        for imodel = 1:Model.count
+            plot( DetEffSim.pph ...
+                , DetEffSim.eff(:,imodel) ...
+                , 'linewidth', 3 ...
+                ..., 'color', DetEffSim.color{imodel} ...
+                )
+        end
+        set(gca,'xscale','log');
+        set(gca, 'fontsize',fontSize);
+        xlim( pphRange );
+        ylim( [0 1] );
+        xlabel('1024ms Peak Photon Flux: P_{ph} [ ph / s / cm^2 ]', 'Interpreter', 'tex', 'fontSize', fontSize);
+        ylabel('BATSE LGRB Detection Efficiency', 'Interpreter', 'tex', 'fontSize', fontSize);
+        legend  ( detEffLegend ...
+                , 'location' , 'southeast' ...
+                , 'fontSize' , fontSize ...
+                , 'color' , 'none' ...
+                , 'box', 'off' ...
+                );
+
+    if figExportRequested
+        set ( gca , 'color' , 'none' , 'fontSize' , fontSize )
+        export_fig (fileName,'-m2 -transparent')
+        hold off; close(gcf);
+    else
+        hold off;
+    end
+
+end

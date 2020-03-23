@@ -1,0 +1,43 @@
+&InputData
+
+    starFormationModel  = H06
+                        , L08
+                        , B10
+                        , M14
+    outPathBase         = "./out/"
+
+/
+
+
+&ParaDRAM
+
+   sampleSize                   = 0
+   !outputColWidth              = 0
+   !outputDelimiter             = ""
+   !outputRealPrecision         = 8
+   !fileBase                    = "./out/"
+   !randomSeed                  = 454545,
+   !randomSeed                  = 11111,
+   !AccRange                    = 0.1e0,0.25e0,
+    targetAcceptanceRatio       = 0.234e0,
+    scaleFactor                 = "1.*gelman",
+    sampleSize                  = 2500,
+    VarName                     = redshift
+    chainSize                   = 200000,
+    adaptiveUpdateCount         = 200000,
+    greedyAdaptationCount       = 0,
+    adaptiveUpdatePeriod        = 100,
+    progressReportPeriod        = 100,
+    proposalModel               = gaussian,
+    parallelModel               = singleChain,
+    Domain(:,1)                 = 0.0,
+    Domain(:,2)                 = 1.e300,
+    maxNumDomainCheckToWarn     = 100
+    maxNumDomainCheckToStop     = 1000
+   !inputFileHasPriority        = .true.
+    compactChainRequested       = .true.
+    randomStartPointRequested   = .false.
+    singleRestartFileRequested  = .true.
+
+    StartPoint = 1.5
+/
