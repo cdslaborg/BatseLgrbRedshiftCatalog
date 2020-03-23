@@ -1,0 +1,8 @@
+! Do not change the contents or the order of the files in this file.
+..\..\cosmicRate\src\IntegrationOverZ_mod.f90
+..\..\cosmicRate\src\IntegrationOverLiso_mod.f90
+..\..\cosmicRate\src\IntegrationOverEpkz_mod.f90
+..\..\cosmicRate\src\WorldModelForBatseLGRB_mod.f90
+ParaPost_mod.f90
+zestimate_mod.f90
+main.f90

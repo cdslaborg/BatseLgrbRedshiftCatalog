@@ -1,0 +1,8 @@
+&InputData
+
+    ngrb = 1366
+    inputBatseDataFile  = ".\in\batse_1366_lgrb_p1024ph_epk_sch23ph.txt"
+    outputBatseDataFile = ".\in\batse_1366_lgrb_pbol_epk_sbol(0.001,20000).txt"
+    outDir              = ".\out\"
+
+/

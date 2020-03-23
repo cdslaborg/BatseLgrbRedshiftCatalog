@@ -1,0 +1,28 @@
+\hline
+\multicolumn{4}{c}{Location Parameters (${\up{\mu}$}) \\
+\hline
+$\logten(\liso)$ & $51.06\pm0.36$ & $51.74\pm0.12$ & $51.25\pm0.21$ \\
+$\logten(\epkz)$ & $51.53\pm0.38$ & $52.18\pm0.12$ & $51.59\pm0.23$ \\
+$\logten(\eiso)$ & $2.35\pm0.09$ & $2.52\pm0.04$ & $2.41\pm0.06$ \\
+$\logten(\durz)$ & $1.13\pm0.04$ & $1.13\pm0.02$ & $1.03\pm0.05$ \\
+\hline
+\multicolumn{4}{c}{Scale Parameters (diagonal elements of $\up{\Sigma}$)} \\
+\hline
+$\sigma_{\logten(\liso)}$ & $0.70\pm0.15$ & $0.44\pm0.06$ & $0.92\pm0.07$ \\
+$\sigma_{\logten(\eiso)}$ & $0.38\pm0.02$ & $0.36\pm0.01$ & $0.41\pm0.02$ \\
+$\sigma_{\logten(\epkz)}$ & $0.93\pm0.12$ & $0.76\pm0.05$ & $1.10\pm0.08$ \\
+$\sigma_{\logten(\durz)}$ & $0.43\pm0.01$ & $0.43\pm0.01$ & $0.42\pm0.01$ \\
+\hline
+\multicolumn{4}{c}{Correlation Coefficients (non-diagonal elements of $\up{\Sigma}$)} \\
+\hline
+$\rho_{\liso-\epkz)}$ & $0.53\pm0.07$ & $0.44\pm0.08$ & $0.60\pm0.05$ \\
+$\rho_{\liso-\eiso)}$ & $0.93\pm0.02$ & $0.95\pm0.02$ & $0.95\pm0.01$ \\
+$\rho_{\liso-\durz)}$ & $0.39\pm0.10$ & $0.60\pm0.08$ & $0.36\pm0.08$ \\
+$\rho_{\epkz-\eiso)}$ & $0.62\pm0.05$ & $0.56\pm0.04$ & $0.69\pm0.04$ \\
+$\rho_{\epkz-\durz)}$ & $0.29\pm0.04$ & $0.32\pm0.04$ & $0.34\pm0.05$ \\
+$\rho_{\eiso-\durz)}$ & $0.54\pm0.06$ & $0.65\pm0.04$ & $0.50\pm0.06$ \\
+\hline
+\multicolumn{4}{c}{BATSE Detection Efficiency (Sample Incompleteness)} \\
+\hline
+$\mu_{th}$ & $-0.33\pm0.01$ & $-0.34\pm0.01$ & $-0.34\pm0.01$ \\
+$\sigma_{th}$ & $-0.86\pm0.05$ & $-0.91\pm0.05$ & $-0.92\pm0.04$ \\
