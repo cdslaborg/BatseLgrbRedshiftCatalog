@@ -118,8 +118,9 @@ Thumbs.db
 *_chain.txt
 *_report.txt
 *_restart.txt
+*_restart.bin
+*_progress.txt
 *.stderr
-*.err
 *.temp
 *.rfn
 ___*___.*
@@ -141,18 +142,18 @@ CTestTestfile.cmake
 _deps
 
 #########################
-# figures
+# latex files
+#########################
+
+*.tex
+
+#########################
+# photos
 #########################
 
 *.pdf
 *.png
-*.jpg
 *.gif
+*.jpg
 *.jpeg
 *.tiff
-
-#########################
-# LaTeX
-#########################
-
-*.tex
