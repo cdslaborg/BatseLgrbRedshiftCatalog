@@ -28,7 +28,7 @@
     greedyAdaptationCount       = 0,
     adaptiveUpdatePeriod        = 100,
     progressReportPeriod        = 100,
-    proposalModel               = gaussian,
+    proposalModel               = normal,
     parallelModel               = singleChain,
     Domain(:,1)                 = 0.0,
     Domain(:,2)                 = 1.e300,

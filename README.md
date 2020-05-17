@@ -28,3 +28,14 @@ This indicates that the LGRB world model overall, can serve as an approximately 
 
 Amir Shahmoradi, Friday 10:07 PM, September 21, 2012, IFS, UTEXAS.  
 
+## Acknowledgment
+
+As per the project's license agreement terms, if you use any parts of this library for any purposes, we ask you to acknowledge the usage in your work (education/research/industry/development/...) by citing the resulting scientific paper from this work described below in BibTeX format:  
+
+@article{shahmoradi2019catalog,
+  title={A Catalog of Redshift Estimates for 1366 BATSE Long-Duration Gamma-Ray Bursts: Evidence for Strong Selection Effects on the Phenomenological Prompt Gamma-Ray Correlations},
+  author={Shahmoradi, Amir and Nemiroff, Robert J},
+  journal={arXiv preprint arXiv:1903.06989},
+  year={2019}
+}
+
