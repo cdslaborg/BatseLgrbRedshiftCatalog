@@ -49,7 +49,7 @@ do imodel = 1, N_SFR_MODEL
     if (StarFormationModel(imodel)=="H06") then
 
         call runParaDRAM( ndim          = 1_IK &
-                        , getLogFunc    = getLogRateH06 &
+                        , getLogFunc    = wrapLogRateH06 &
                         , inputFile     = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record &
                         , fileBase      = outPathBase // StarFormationModel(imodel) &
                         )
@@ -57,7 +57,7 @@ do imodel = 1, N_SFR_MODEL
     elseif (StarFormationModel(imodel)=="L08") then
 
         call runParaDRAM( ndim          = 1_IK &
-                        , getLogFunc    = getLogRateL08 &
+                        , getLogFunc    = wrapLogRateL08 &
                         , inputFile     = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record &
                         , fileBase      = outPathBase // StarFormationModel(imodel) &
                         )
@@ -65,7 +65,7 @@ do imodel = 1, N_SFR_MODEL
     elseif (StarFormationModel(imodel)=="B10") then
 
         call runParaDRAM( ndim          = 1_IK &
-                        , getLogFunc    = getLogRateB10 &
+                        , getLogFunc    = wrapLogRateB10 &
                         , inputFile     = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record &
                         , fileBase      = outPathBase // StarFormationModel(imodel) &
                         )
@@ -73,7 +73,7 @@ do imodel = 1, N_SFR_MODEL
     elseif (StarFormationModel(imodel)=="M14") then
 
         call runParaDRAM( ndim          = 1_IK &
-                        , getLogFunc    = getLogRateM14 &
+                        , getLogFunc    = wrapLogRateM14 &
                         , inputFile     = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record &
                         , fileBase      = outPathBase // StarFormationModel(imodel) &
                         )
@@ -96,7 +96,7 @@ contains
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
 
-    pure function getLogRateH06(nd,Redshift) result(logRate)
+    pure function wrapLogRateH06(nd,Redshift) result(logRate)
         use Cosmology_mod, only: getLogLumDisWicMpc
 #ifdef SFR_DENSITY_ENABLED
         use StarFormation_mod, only: getLogRate => getLogDensitySFRH06
@@ -114,17 +114,17 @@ contains
                             , twiceLogLumDisMpc = 2 * getLogLumDisWicMpc(zplus1) &
 #endif
                             )
-    end function getLogRateH06
+    end function wrapLogRateH06
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
 
-    pure function getLogRateL08(nd,Redshift) result(logRate)
+    pure function wrapLogRateL08(nd,Redshift) result(logRate)
         use Cosmology_mod, only: getLogLumDisWicMpc
 #ifdef SFR_DENSITY_ENABLED
-        use StarFormation_mod, only: getLogRate => getLogDensitySFRL08
+        use StarFormation_mod, only: getLogRate => getLogRateDensityL08
 #else
-        use StarFormation_mod, only: getLogRate => getLogSFRL08
+        use StarFormation_mod, only: getLogRate => getLogRateL08
 #endif
         implicit none
         integer(IK), intent(in) :: nd
@@ -137,12 +137,12 @@ contains
                             , twiceLogLumDisMpc = 2 * getLogLumDisWicMpc(zplus1) &
 #endif
                             )
-    end function getLogRateL08
+    end function wrapLogRateL08
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
 
-    pure function getLogRateB10(nd,Redshift) result(logRate)
+    pure function wrapLogRateB10(nd,Redshift) result(logRate)
         use Cosmology_mod, only: getLogLumDisWicMpc
 #ifdef SFR_DENSITY_ENABLED
         use StarFormation_mod, only: getLogRate => getLogDensitySFRB10
@@ -160,12 +160,12 @@ contains
                             , twiceLogLumDisMpc = 2 * getLogLumDisWicMpc(zplus1) &
 #endif
                             )
-    end function getLogRateB10
+    end function wrapLogRateB10
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
 
-    pure function getLogRateM14(nd,Redshift) result(logRate)
+    pure function wrapLogRateM14(nd,Redshift) result(logRate)
         use Cosmology_mod, only: getLogLumDisWicMpc
 #ifdef SFR_DENSITY_ENABLED
         use StarFormation_mod, only: getLogRate => getLogDensitySFRM14
@@ -183,7 +183,7 @@ contains
                             , twiceLogLumDisMpc = 2 * getLogLumDisWicMpc(zplus1) &
 #endif
                             )
-    end function getLogRateM14
+    end function wrapLogRateM14
 
 !***********************************************************************************************************************************
 !***********************************************************************************************************************************
