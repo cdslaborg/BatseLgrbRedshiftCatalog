@@ -2,6 +2,7 @@ close all;
 %clear all;
 format compact; format long;
 filePath = mfilename('fullpath');
+addpath(genpath("../lib/"));
 addpath(genpath('../../../../../lib/matlab/')) % lib codes
 
 % change directory to the srouce code directory
@@ -15,7 +16,7 @@ errBarLineWidth = 1;
 kfac = "kfacOneThird";
 scale = "log";
 %scale = "linear";
-confidence = 50;
+confidence = 90;
 disp(["confidence level: ", num2str(confidence), "%"]);
 
 outDirRoot = fullfile(scriptPath,"out");
@@ -67,12 +68,12 @@ SumLogLike = cell(ZModel.count,1);
 
 for imodel = 1:ZModel.count
 
-    zPath = fullfile(rootPath,ZModel.ID(imodel),"bin","out");
-    zgridFilePath = fullfile(zPath,"zgrid.txt");
+    zDir = fullfile(rootPath,ZModel.ID(imodel),"bin","out");
+    zgridFilePath = fullfile(zDir,"zgrid.txt");
     zgrid = importdata(zgridFilePath);
 
     %if ~isfield(ZModel,ZModel.ID(imodel))
-        ZModel.(ZModel.ID(imodel)).zstat = importdata(fullfile(zPath,"batse_zstat.txt"));
+        ZModel.(ZModel.ID(imodel)).zstat = importdata(fullfile(zDir,"batse_zstat.txt"));
         ZModel.(ZModel.ID(imodel)).zstat.count = length(ZModel.(ZModel.ID(imodel)).zstat.data(:,1));
     %end
     Map = mapTriggers( BatseZ.data(:,1) , ZModel.(ZModel.ID(imodel)).zstat.data(:,1) );
@@ -92,7 +93,7 @@ for imodel = 1:ZModel.count
     % lets also get the likelihood of the known redshifts
     SumLogLike{imodel} = 0.0;
     for igrb = 1:BatseZ.count
-        zdistFilePath = fullfile( zPath, "zprob_" + string(sprintf('%04d',BatseZ.data(igrb,1))) + ".txt" );
+        zdistFilePath = fullfile( zDir, "zprob_" + string(sprintf('%04d',BatseZ.data(igrb,1))) + ".txt" );
         if exist(zdistFilePath,"file")
             zdist = importdata(zdistFilePath);
             zdist.data = zdist.data / sum(zdist.data);
@@ -149,7 +150,7 @@ for imodel = 1:ZModel.count
 
     %rho = sprintf('%0.2f', corr(log(X.Dat),log(Y.Dat),'type','Pearson'));
     %%rho = sprintf('%0.2f', corr(X.Dat,Y.Dat,'type','Pearson'));
-    %rhoPos = [0.035,0.93]; %[0.1,15];
+   %rhoPos = [0.035,0.93]; %[0.1,15];
     %text( rhoPos(1), rhoPos(2)-0.08 ...
     %    , ['\rho = ',num2str(rho)] ...
     %    , 'HorizontalAlignment', 'left' ...
@@ -157,11 +158,11 @@ for imodel = 1:ZModel.count
     %    , 'Interpreter','tex', 'fontSize' , fontSize )
 
     % add the joint likelihood of measured redshifts
-    text( rhoPos(1), rhoPos(2) ...
-        , ['log_{10}\pi(Measured|Predicted) = ',sprintf('%.2f',round(SumLogLike{imodel},2))] ...
-        , 'HorizontalAlignment', 'left' ...
-        , 'units', 'normalized' ...
-        , 'Interpreter','tex', 'fontSize' , fontSize )
+   %text( rhoPos(1), rhoPos(2) ...
+   %    , ['log_{10}\pi(Measured|Predicted) = ',sprintf('%.2f',round(SumLogLike{imodel},2))] ...
+   %    , 'HorizontalAlignment', 'left' ...
+   %    , 'units', 'normalized' ...
+   %    , 'Interpreter','tex', 'fontSize' , fontSize )
 
     set(gca,'color','none', 'fontSize', fontSize)
     %set(gcf,'color','none')

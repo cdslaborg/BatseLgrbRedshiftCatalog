@@ -106,6 +106,7 @@ Thumbs.db
 **/.ipynb_checkpoints/*
 **/__pycache__/*
 **/build/*
+**/trash/*
 **/temp/*
 **/bin/*
 **/out/*
