@@ -3,14 +3,20 @@ module Zestimate_mod
     use Batse_mod, only: NVAR, GRB, Trigger, NGRB => NLGRB
     use ParaPost_mod, only: NSAMPLE, ParaPost
     use Constants_mod, only: IK, RK, PI
-#ifdef H06
-    use Astro_mod, only: getLogSFR => getLogSFRH06
+#if defined H06
+    use StarFormation_mod, only: getLogSFR => getLogRateH06
 #elif defined L08
-    use Astro_mod, only: getLogSFR => getLogSFRL08
+    use StarFormation_mod, only: getLogSFR => getLogRateL08
 #elif defined B10
-    use Astro_mod, only: getLogSFR => getLogSFRB10
+    use StarFormation_mod, only: getLogSFR => getLogRateB10
+#elif defined M14
+    use StarFormation_mod, only: getLogSFR => getLogRateM14
+#elif defined M17
+    use StarFormation_mod, only: getLogSFR => getLogRateM17
+#elif defined F18
+    use StarFormation_mod, only: getLogSFR => getLogRateF18
 #else
-#error "Unknown SFR model in WorldModelForBatseLGRB_mod.f90"
+#error "Unknown SFR model in BatseLgrbWorldModel_mod.f90"
 #endif
 
     implicit none
@@ -40,13 +46,12 @@ contains
     subroutine zestimate(outPath)
 
         use, intrinsic :: iso_fortran_env, only: output_unit
-        use Astro_mod, only: LOGMPC2CMSQ4PI, getLogLumDisWicMpc !, getlogdvdz
+        use Cosmology_mod, only: LOGMPC2CMSQ4PI, getLogLumDisWicMpc
         use Constants_mod, only: IK, RK, SPR, CARRIAGE_RETURN, CLOCK_TICK
         use String_mod, only: num2str
-        use Timer_mod, only: Timer_type
         use System_mod, only: OS_type
+        use Timer_mod, only: Timer_type
         use Path_mod, only: winifyPath, linifyPath
-        !use Math_mod, only: getCumSum
 
         implicit none
 
@@ -60,6 +65,7 @@ contains
         type(Timer_type)            :: Timer
 
         ! quantiles
+
         integer                     :: iq
         integer(IK), parameter      :: NQ = 5
         real(RK), parameter         :: QPROB(NQ) = [0.05_RK, 0.25_RK, 0.5_RK, 0.75_RK, 0.95_RK]
@@ -143,6 +149,7 @@ contains
         do igrb = 1, NGRB
 
             ! compute the detection efficiency for each GRB for each ParaPost sample
+
             do isample = 1, NSAMPLE
                 mv_DetectionEfficiency(isample) = ParaPost(isample)%Thresh%invStdSqrt2 &
                                                 * ( GRB%Event(igrb)%logPF53 - ParaPost(isample)%Thresh%avg )
@@ -174,6 +181,7 @@ contains
             StatZ%mean = StatZ%mean * normCoef
 
             ! compute the quantiles
+
             iq = 1
             StatZ%Quantile = -999._RK
             loopZ: do iz = 1, NZ
@@ -185,6 +193,7 @@ contains
             end do loopZ
 
             ! write out the quantiles
+
             write(fileUnitStatZ,"(*(g0.8,:,','))") Trigger(igrb), StatZ%mean, StatZ%mode, StatZ%Quantile
 
             call Timer%toc()
@@ -214,6 +223,7 @@ contains
         write(fileUnit,"(*(g0))") "z,normedBatseRate,normedSFR,cumSumNormedBatseRate,cumSumNormedSFR"
 
         ! get the cumulative distributions
+
         iz = 1
         mv_Zinfo(iz)%logSFR = exp(mv_Zinfo(iz)%logSFR)
         CumSumBatseRate(iz) = BatseRate(iz)
@@ -246,8 +256,8 @@ contains
     pure function getProbZ(iz,igrb) result(probZ)
 
         use Constants_mod, only: IK, RK
-#ifdef KFAC_ONETHIRD_ENABLED
-        use WorldModelForBatseLGRB_mod, only: TIME_DILATION_EXPO
+#if defined kfacOneThird
+        use BatseLgrbWorldModel_mod, only: TIME_DILATION_EXPO
 #endif
         implicit none
         integer(IK) , intent(in)    :: iz,igrb
@@ -260,15 +270,17 @@ contains
         do isample = 1,NSAMPLE
 
             ! observed data probability
+
             MeanSubtractedVar(1) = GRB%Event(igrb)%logPbol - ParaPost(isample)%Avg(1) + mv_Zinfo(iz)%logLisoLogPbolDiff
             MeanSubtractedVar(2) = GRB%Event(igrb)%logEpk  - ParaPost(isample)%Avg(2) + mv_Zinfo(iz)%logzplus1
             MeanSubtractedVar(3) = GRB%Event(igrb)%logsbol - ParaPost(isample)%Avg(3) + mv_Zinfo(iz)%logEisoLogSbolDiff
-#ifdef KFAC_ONETHIRD_ENABLED
+#if defined kfacOneThird
             MeanSubtractedVar(4) = GRB%Event(igrb)%logt90  - ParaPost(isample)%Avg(4) - mv_Zinfo(iz)%logzplus1*TIME_DILATION_EXPO
-#else
+#elif defined kfacNone
             MeanSubtractedVar(4) = GRB%Event(igrb)%logt90  - ParaPost(isample)%Avg(4) - mv_Zinfo(iz)%logzplus1
+#else
+#error "kfactor model requested in BatseLgrbWorldModel_mod.f90"
 #endif
-
             probZ   = probZ &
                     + mv_DetectionEfficiency(isample) * ParaPost(isample)%coef * exp( mv_Zinfo(iz)%logSFR - 0.5_RK &
                     * dot_product( MeanSubtractedVar , matmul(ParaPost(isample)%InvCovMat,MeanSubtractedVar) ) )

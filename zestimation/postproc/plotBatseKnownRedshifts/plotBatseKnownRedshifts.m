@@ -9,44 +9,55 @@ filePath = mfilename('fullpath');
 [scriptPath,~,~] = fileparts(filePath); cd(scriptPath); % Change working directory to source code directory.
 cd(scriptPath); % Change working directory to source code directory.
 
-inPath = '../../in/';
+inPath = "../../in/";
 fontSize = 13;
 errBarLineWidth = 1;
-kfac = 'kfacOneThird';
-%scale = 'log';
-scale = 'linear';
+kfac = "kfacOneThird";
+scale = "log";
+%scale = "linear";
 confidence = 50;
+disp(["confidence level: ", num2str(confidence), "%"]);
 
-outDir = [kfac,'/PI',num2str(confidence),'/',scale,'/'];
-disp(['confidence level: ', num2str(confidence), '%']);
+outDirRoot = fullfile(scriptPath,"out");
+mkdir(outDirRoot);
+
+outDir = fullfile(outDirRoot,kfac,"PI"+string(confidence),scale);
+mkdir(outDir);
+
 if confidence==50
     SNErrCol = {5,7}; % 50%
 elseif confidence==90
     SNErrCol = {4,8}; % 90%
 else
-    error(['The requested confidence level is not supported:', num2str(confidence)]);
+    error(["The requested confidence level is not supported:", num2str(confidence)]);
 end
-mkdir(outDir);
 
-rootPath = ['../../winx64/intel/release/static/serial/',kfac,'/'];
+rootPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/" + kfac;
 
 figExportRequested = 1;
 markerSize = 20;
-if strcmp(scale,'log')
+if strcmp(scale,"log")
     RangeZ = [0.1,10.0];
-elseif strcmp(scale,'linear')
+elseif strcmp(scale,"linear")
     RangeZ = [0.1,4.0];
 end
 
-ZModel.count = 3;
-ZModel.Ref = { 'This Work (H06 Rate)' ...
-             , 'This Work (L08 Rate)' ...
-             , 'This Work (B10 Rate)' ...
-             };
-ZModel.ID = {'H06','L08','B10'};%,'B04','F00','Y04'};
+ZModel.Ref = [ "This Work (H06 Rate)"   ...
+             , "This Work (L08 Rate)"   ...
+             , "This Work (B10 Rate)"   ...
+             , "This Work (M14 Rate)"   ...
+             , "This Work (M17 Rate)"   ...
+             , "This Work (F18 Rate)"   ...
+             , "Band (2004)"            ...
+             , "Fenimore (2000)"        ...
+             , "Yonetoku (2004)"        ...
+             ];
+ZModel.ID = ["H06","L08","B10","M14","M17","F18"];%,"B04","F00","Y04"];
+ZModel.count = length(ZModel.ID);
 
 % read BATSE known redshifts
-BatseZ = importdata([inPath,'BatseKnownRedshifts.txt']);
+
+BatseZ = importdata(fullfile(inPath,"BatseKnownRedshifts.txt"));
 Mask = BatseZ.data(:,1)==6665 | BatseZ.data(:,1)==6707;
 BatseZ.data = BatseZ.data(~Mask,:);
 BatseZ.count = length(BatseZ.data(:,1));
@@ -56,32 +67,33 @@ SumLogLike = cell(ZModel.count,1);
 
 for imodel = 1:ZModel.count
 
-    zPath = [rootPath,ZModel.ID{imodel},'/bin/out/'];
-    zgrid = importdata([zPath,'/zgrid.txt']);
+    zPath = fullfile(rootPath,ZModel.ID(imodel),"bin","out");
+    zgridFilePath = fullfile(zPath,"zgrid.txt");
+    zgrid = importdata(zgridFilePath);
 
-    %if ~isfield(ZModel,ZModel.ID{imodel})
-        ZModel.(ZModel.ID{imodel}).zstat = importdata([zPath,'batse_zstat.txt']);
-        ZModel.(ZModel.ID{imodel}).zstat.count = length(ZModel.(ZModel.ID{imodel}).zstat.data(:,1));
+    %if ~isfield(ZModel,ZModel.ID(imodel))
+        ZModel.(ZModel.ID(imodel)).zstat = importdata(fullfile(zPath,"batse_zstat.txt"));
+        ZModel.(ZModel.ID(imodel)).zstat.count = length(ZModel.(ZModel.ID(imodel)).zstat.data(:,1));
     %end
-    Map = mapTriggers( BatseZ.data(:,1) , ZModel.(ZModel.ID{imodel}).zstat.data(:,1) );
+    Map = mapTriggers( BatseZ.data(:,1) , ZModel.(ZModel.ID(imodel)).zstat.data(:,1) );
     X.Dat = BatseZ.data(Map.Indx1,2);
     X.Err.Neg = BatseZ.data(Map.Indx1,3);
     X.Err.Pos = BatseZ.data(Map.Indx1,4);
 
     % prepare predicted redshifts
     zpos = 2;
-    Y.Dat = ZModel.(ZModel.ID{imodel}).zstat.data(Map.Indx2,zpos);
-    Y.Err.Neg   = ZModel.(ZModel.ID{imodel}).zstat.data(Map.Indx2,zpos) ...
-                - ZModel.(ZModel.ID{imodel}).zstat.data(Map.Indx2,SNErrCol{1});
-    Y.Err.Pos   = ZModel.(ZModel.ID{imodel}).zstat.data(Map.Indx2,zpos) ...
-                - ZModel.(ZModel.ID{imodel}).zstat.data(Map.Indx2,SNErrCol{2});
+    Y.Dat = ZModel.(ZModel.ID(imodel)).zstat.data(Map.Indx2,zpos);
+    Y.Err.Neg   = ZModel.(ZModel.ID(imodel)).zstat.data(Map.Indx2,zpos) ...
+                - ZModel.(ZModel.ID(imodel)).zstat.data(Map.Indx2,SNErrCol{1});
+    Y.Err.Pos   = ZModel.(ZModel.ID(imodel)).zstat.data(Map.Indx2,zpos) ...
+                - ZModel.(ZModel.ID(imodel)).zstat.data(Map.Indx2,SNErrCol{2});
     Y.Err.Pos   = abs(Y.Err.Pos);
 
     % lets also get the likelihood of the known redshifts
     SumLogLike{imodel} = 0.0;
     for igrb = 1:BatseZ.count
-        zdistFilePath = [zPath,'zprob_',sprintf('%04d',BatseZ.data(igrb,1)),'.txt'];
-        if exist(zdistFilePath,'file')
+        zdistFilePath = fullfile( zPath, "zprob_" + string(sprintf('%04d',BatseZ.data(igrb,1))) + ".txt" );
+        if exist(zdistFilePath,"file")
             zdist = importdata(zdistFilePath);
             zdist.data = zdist.data / sum(zdist.data);
             notFound = 1;
@@ -98,7 +110,7 @@ for imodel = 1:ZModel.count
                 end
             end
         else
-            disp([zdistFilePath, ' does not exist.']);
+            disp( "NOTE: " + zdistFilePath + " does not exist. skipping..." );
         end
     end
 
@@ -122,17 +134,17 @@ for imodel = 1:ZModel.count
                         , 'CapSize', 0 ...
                         );
     ErrPlot.LineWidth = errBarLineWidth;
-    xlabel(['Associated Host Galaxy''s Redshift'], 'fontSize', fontSize)
-    ylabel(['Predicted Redshift: ',ZModel.Ref{imodel}], 'fontSize', fontSize)
+    xlabel("Associated Host Galaxy's Redshift", 'fontSize', fontSize)
+    ylabel("Predicted Redshift: " + ZModel.Ref(imodel), "fontSize", fontSize)
     xlim(RangeZ);
     ylim(RangeZ);
     set(gca,'xscale',scale)
     set(gca,'yscale',scale)
-    legend  ( { 'equality line' , [num2str(length(Y.Dat)),' BATSE LGRBs'] } ...
+    legend  ( [ "equality line" , string(length(Y.Dat)) + " BATSE LGRBs" ] ...
             , 'location' , 'southeast' ...
             , 'fontSize' , fontSize ...
             , 'color' , 'none' ...
-            )
+            );
     %legend boxoff;
 
     %rho = sprintf('%0.2f', corr(log(X.Dat),log(Y.Dat),'type','Pearson'));
@@ -154,7 +166,7 @@ for imodel = 1:ZModel.count
     set(gca,'color','none', 'fontSize', fontSize)
     %set(gcf,'color','none')
     if figExportRequested
-        export_fig ([outDir,ZModel.ID{imodel},'vsMeasuredZ.png'],'-m2 -transparent')
+        export_fig (fullfile(outDir,ZModel.ID(imodel)+"vsMeasuredZ.png"),"-m2 -transparent")
         hold off; close(gcf);
     else
         hold off;

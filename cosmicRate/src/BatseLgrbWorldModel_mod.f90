@@ -1,6 +1,6 @@
 module BatseLgrbWorldModel_mod
 
-#ifdef H06
+#if defined H06
     use StarFormation_mod, only: getLogRate => getLogRateH06
 #elif defined L08
     use StarFormation_mod, only: getLogRate => getLogRateL08
@@ -20,7 +20,7 @@ module BatseLgrbWorldModel_mod
 
     implicit none
 
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
     real(RK)                :: zone_relerr, zgrb_relerr, liso_relerr, epkz_relerr
     real(RK)                :: zone_neval, zgrb_neval, liso_neval, epkz_neval
     integer(IK)             :: zgrb_count, liso_count, epkz_count
@@ -42,7 +42,7 @@ module BatseLgrbWorldModel_mod
 
     ! the exponent of zone in time-dilation translation of T90 to T90z
 
-#ifdef kfacOneThird
+#if defined kfacOneThird
     real(RK)    , parameter :: TIME_DILATION_EXPO = 0.666666666666667_RK
 #endif
 
@@ -268,7 +268,7 @@ contains
             error stop
         end if
 #else
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
         zgrb_count  = 0_IK
         liso_count  = 0_IK
         epkz_count  = 0_IK
@@ -299,7 +299,7 @@ contains
             return
             !error stop
         end if
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
         zone_neval  = neval
         zone_relerr = abs(relerr) / modelint
 #endif
@@ -375,7 +375,7 @@ contains
                 return
                 !error stop
             end if
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
         zgrb_count  = zgrb_count + 1_IK
         zgrb_neval  = zgrb_neval + neval
         zgrb_relerr = zgrb_relerr + abs(relerr) / probGRB
@@ -391,7 +391,7 @@ contains
             logPostProb = logPostProb + log( probGRB / (modelint*normFac) )
         end do loopLogPostProb
 
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
         zgrb_neval = zgrb_neval / zgrb_count
         liso_neval = liso_neval / liso_count
         epkz_neval = epkz_neval / epkz_count
@@ -447,7 +447,7 @@ contains
                                 , numFuncEval       = neval                                         &
                                 , ierr              = ierr                                          &
                                 )
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
         liso_count  = liso_count + 1_IK
         liso_neval  = liso_neval + neval
         liso_relerr = liso_relerr + abs(relerr) / modelIntOverLogLisoGivenZ
@@ -509,7 +509,7 @@ contains
                                 , numFuncEval       =  neval                            &
                                 , ierr              =  mv_ierr                          &
                                 )
-#ifdef ERR_ESTIMATION_ENABLED
+#if defined ERR_ESTIMATION_ENABLED
         epkz_count  = epkz_count + 1_IK
         epkz_neval  = epkz_neval + neval
         epkz_relerr = epkz_relerr + abs(relerr) / modelIntOverLogEpkzGivenLogLisoZ
@@ -581,10 +581,12 @@ contains
         MeanSubtractedVar(1) = GRB%Event(mv_igrb)%logPbol - mv_Avg%logLiso + logLisoLogPbolDiff
         MeanSubtractedVar(2) = GRB%Event(mv_igrb)%logEpk  - mv_Avg%logEpkz + logZone
         MeanSubtractedVar(3) = GRB%Event(mv_igrb)%logsbol - mv_Avg%logEiso - logZone + logLisoLogPbolDiff
-#ifdef kfacOneThird
+#if defined kfacOneThird
         MeanSubtractedVar(4) = GRB%Event(mv_igrb)%logt90  - mv_Avg%logT90z - logZone * TIME_DILATION_EXPO
-#else
+#elif defined kfacNone
         MeanSubtractedVar(4) = GRB%Event(mv_igrb)%logt90  - mv_Avg%logT90z - logZone
+#else
+#error "kfactor model requested in BatseLgrbWorldModel_mod.f90"
 #endif
 
         probGRB = getBatseEfficiency( mv_Thresh%invStdSqrt2 * ( GRB%Event(mv_igrb)%logPF53 - mv_Thresh%avg ) ) &

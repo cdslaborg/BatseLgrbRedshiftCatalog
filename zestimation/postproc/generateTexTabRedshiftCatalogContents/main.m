@@ -8,17 +8,17 @@ filePath = mfilename('fullpath');
 [scriptPath,fileName,fileExt] = fileparts(filePath); cd(scriptPath); % Change working directory to source code directory.
 cd(scriptPath); % Change working directory to source code directory.
 
-kfac = 'kfacOneThird';
-inPath = ['../../winx64/intel/release/static/serial/',kfac,'/'];
-outDir = [kfac,'/'];
+kfac = "kfacOneThird";
+inPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/" + kfac;
+outDir = fullfile("out",kfac);
 mkdir(outDir)
 
-Zmodel.ID = {'H06','L08','B10'};
-Zmodel.count = 3;
+Zmodel.ID = ["H06","B10","M17","F18"];
+Zmodel.count = length(Zmodel.ID);
 
 for imodel = 1:Zmodel.count
-    Zmodel.(Zmodel.ID{imodel}) = importdata([inPath,Zmodel.ID{imodel},'/bin/out/batse_zstat.txt']);
-    Zmodel.(Zmodel.ID{imodel}).data = sortrows(Zmodel.(Zmodel.ID{imodel}).data,1);
+    Zmodel.(Zmodel.ID(imodel)) = importdata(fullfile(inPath,Zmodel.ID(imodel),"bin","out","batse_zstat.txt"));
+    Zmodel.(Zmodel.ID(imodel)).data = sortrows(Zmodel.(Zmodel.ID(imodel)).data,1);
 end
 ngrb = length(Zmodel.(Zmodel.ID{1}).data(:,1));
 LaTab = cell(ngrb,1);
@@ -62,6 +62,6 @@ for igrb = 1:ngrb
 end
 
 % write to output file
-fid = fopen([outDir,'tabRedshiftCatalogContents.tex'],'w');
+fid = fopen(fullfile(outDir,"tabRedshiftCatalogContents.tex"),"w");
 fprintf(fid,'%s\n',LaTab{:});
 fclose(fid);
