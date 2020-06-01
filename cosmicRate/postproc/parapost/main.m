@@ -236,7 +236,7 @@ TAB = '    ';
 texTab{irow} = ['\begin{table*}[t]%[tphb]']; irow = irow + 1;
 texTab{irow} = [TAB,'\begin{center}']; irow = irow + 1;
 texTab{irow} = [TAB,TAB,'\vspace{5mm}']; irow = irow + 1;
-texTab{irow} = [TAB,TAB,'\caption{Mean best-fit parameters of the LGRB World Model, \eqref{eq:modelGeneric}, for the three redshift distribution scenarios considered.\label{tab:paraPostStat}}']; irow = irow + 1;
+texTab{irow} = [TAB,TAB,'\caption{Mean best-fit parameters of the LGRB World Model, \eqref{eq:modelGeneric}, for the four redshift distribution scenarios considered.\label{tab:paraPostStat}}']; irow = irow + 1;
 texTab{irow} = [TAB,TAB,'\begin{tabular}{', repmat('c ',1,Model.count+1),'}']; irow = irow + 1;
 texTab{irow} = [TAB,TAB,TAB,'\hline']; irow = irow + 1;
 texTab{irow} = [TAB,TAB,TAB,'\hline']; irow = irow + 1;
@@ -273,7 +273,7 @@ texTab{irow} = [TAB,TAB,TAB,'\hline']; irow = irow + 1;
 texTab{irow} = [TAB,TAB,TAB,'\hline']; irow = irow + 1;
 texTab{irow} = [TAB,TAB,'\end{tabular}']; irow = irow + 1;
 texTab{irow} = [TAB,'\end{center}']; irow = irow + 1;
-texTab{irow} = [TAB,'{Note.--- The joint posterior distribution of the 16-dimensional parameters of the model resulting from the Markov chains are available for download at \url{https://github.com/shahmoradi/BatseRedshiftEstimates} for each of the three redshift distributions.}']; irow = irow + 1;
+%texTab{irow} = [TAB,'{Note.--- The joint posterior distribution of the 16-dimensional parameters of the model resulting from the Markov chains are available for download at \url{https://github.com/shahmoradi/BatseRedshiftEstimates} for each of the four redshift distributions.}']; irow = irow + 1;
 texTab{irow} = ['\end{table*}']; irow = irow + 1;
 
 

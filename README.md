@@ -20,17 +20,11 @@ First modified by Amir Shahmoradi, Friday 8:37 PM, September 14, 2012, IFS, UTEX
 
 ## Results  
 
-- The 90% variation of the entire underlying LGRB population is (4.76-0.46)=4.0. The corresponding 50% variation is (3.31-1.37)=2.94.  
-- The average 90% variation for individual BATSE LGRBs is 1.53 \pm 0.52 with a peak at ~ 1.1.  
-- The average 50% variation for individual BATSE LGRBs is 0.67 \pm 0.22 with a peak at ~ 0.45.  
-
-This indicates that the LGRB world model overall, can serve as an approximately good indicator of redshift, in the case of the underlying LGRB population tracing the star formation rate of Hopkins & Beacom (2006).  
-
-Amir Shahmoradi, Friday 10:07 PM, September 21, 2012, IFS, UTEXAS.  
+See the manuscript cited below in **Acknowledgment** for the results.
 
 ## Acknowledgment
 
-As per the project's license agreement terms, if you use any parts of this library for any purposes, we ask you to acknowledge the usage in your work (education/research/industry/development/...) by citing the resulting scientific paper from this work described below in BibTeX format:  
+As per the project's license agreement terms, if you use any parts of this library for any purposes, we ask you to acknowledge its usage in your work (education/research/industry/development/...) by citing the resulting scientific paper from this work described below in BibTeX format:  
 
 @article{shahmoradi2019catalog,
   title={A Catalog of Redshift Estimates for 1366 BATSE Long-Duration Gamma-Ray Bursts: Evidence for Strong Selection Effects on the Phenomenological Prompt Gamma-Ray Correlations},
