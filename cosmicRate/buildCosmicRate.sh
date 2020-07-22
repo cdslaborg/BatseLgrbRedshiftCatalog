@@ -450,8 +450,8 @@ fi
 # preprocessor flags
 ####################################################################################################################################
 
-if [ "${COMPILER_SUITE}" = "gnu" ]; then FPP_FLAGS="-cpp"; fi
-if [ "${COMPILER_SUITE}" = "intel" ]; then FPP_FLAGS="-fpp"; fi
+if [ "${COMPILER_SUITE}" = "gnu" ]; then FPP_FLAGS="-cpp -DIS_COMPATIBLE_COMPILER"; fi
+if [ "${COMPILER_SUITE}" = "intel" ]; then FPP_FLAGS="-fpp -DIS_COMPATIBLE_COMPILER"; fi
 
 if [ "${CFI_ENABLED}" = "true" ]; then FPP_FLAGS="${FPP_FLAGS} -DCFI_ENABLED"; fi
 if [ "${CAF_ENABLED}" = "true" ]; then FPP_FLAGS="${FPP_FLAGS} -DCAF_ENABLED"; fi

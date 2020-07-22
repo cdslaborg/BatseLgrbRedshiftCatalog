@@ -70,8 +70,8 @@
     chainSize                           = 150000
     sampleRefinementCount               = 10
     sampleRefinementMethod              = "BatchMeans"
-    randomStartPointDomainLowerLimitVec = 16*-1.e300
-    randomStartPointDomainUpperLimitVec = 16*+1.e300
+   !randomStartPointDomainLowerLimitVec = 16*-1.e300
+   !randomStartPointDomainUpperLimitVec = 16*+1.e300
     randomStartPointRequested           = false
 
     startPointVec = 
@@ -124,7 +124,7 @@
     0.15886844063376959E+00
 
     proposalStartCorMat = 
-    !            avgLogLiso                avgLogEpkz                avgLogEiso                avgLogT90z                stdLogLiso                stdLogEpkz                stdLogEiso                stdLogT90z          atanhCorLisoEpkz          atanhCorLisoEiso          atanhCorLisoT90z          atanhCorEpkzEiso          atanhCorEpkzT90z          atanhCorEisoT90z              avgLogThresh              stdLogThresh
+    !            avgLogLiso                avgLogEpkz                avgLogEiso                avgLogT90z                logStdLogLiso                logStdLogEpkz                logStdLogEiso                logStdLogT90z          atanhCorLisoEpkz          atanhCorLisoEiso          atanhCorLisoT90z          atanhCorEpkzEiso          atanhCorEpkzT90z          atanhCorEisoT90z              avgLogThresh              logStdLogThresh
     0.10000000000000000E+01   0.94848504354290963E+00   0.99579112902753475E+00   0.73980215534420912E+00  -0.92363140179682945E+00  -0.69243497278760080E+00  -0.90833956603841493E+00   0.11882398337405160E+00  -0.48162141587992768E+00   0.31568505221732868E+00   0.50396368637120048E+00  -0.60680337998463740E+00  -0.28024374260141849E+00   0.39000748338498148E+00  -0.85942823695639647E+00  -0.62399113678979723E+00
     0.94848504354290963E+00   0.10000000000000000E+01   0.95622243822119757E+00   0.72195426170245658E+00  -0.88728582951145818E+00  -0.76910018228783028E+00  -0.89245159106483118E+00   0.12986652452250053E+00  -0.65025970968288416E+00   0.17686889201956257E+00   0.46670231724477523E+00  -0.73656716419257262E+00  -0.25472079275690546E+00   0.39463600113848196E+00  -0.80269458888539524E+00  -0.58497032703151508E+00
     0.99579112902753475E+00   0.95622243822119757E+00   0.10000000000000000E+01   0.77696241216093032E+00  -0.93414640354991241E+00  -0.70969964035257083E+00  -0.92691636290851387E+00   0.11197939644530956E+00  -0.50747250299311553E+00   0.28138687029983012E+00   0.48806144171063975E+00  -0.62993456027153982E+00  -0.30230471712907941E+00   0.37609455280390769E+00  -0.85800232239011542E+00  -0.62541284663502350E+00

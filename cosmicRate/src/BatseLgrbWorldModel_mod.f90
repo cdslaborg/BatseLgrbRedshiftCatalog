@@ -8,6 +8,8 @@ module BatseLgrbWorldModel_mod
     use StarFormation_mod, only: getLogRate => getLogRateB10
 #elif defined M14
     use StarFormation_mod, only: getLogRate => getLogRateM14
+#elif defined P15
+    use StarFormation_mod, only: getLogRate => getLogRateP15
 #elif defined M17
     use StarFormation_mod, only: getLogRate => getLogRateM17
 #elif defined F18

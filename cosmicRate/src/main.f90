@@ -42,6 +42,14 @@ open( newunit = inFileUnit, file = CmdArg%Arg(1)%record//CmdArg%Arg(2)%record, s
     !write(*,*) "epkzTol: ", epkzTol
 close(inFileUnit)
 
+! report kfac correction type
+
+#ifdef kfacOneThird
+write(*,"(*(g0,:,','))") "ATTN: assuming kfacOneThird k-correction..."
+#else
+write(*,"(*(g0,:,','))") "ATTN: assuming NO k-correction..."
+#endif
+
 ! read observed grb input data
 
 call readDataGRB( inputBatseDataFile    &
