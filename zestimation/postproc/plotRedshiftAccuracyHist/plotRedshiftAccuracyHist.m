@@ -4,6 +4,7 @@ format compact; format long;
 filePath = mfilename("fullpath");
 [scriptPath,fileName,fileExt] = fileparts(filePath); cd(scriptPath);
 addpath(genpath("../../../../../lib/matlab/")) % lib codes
+%addpath(genpath('../../../../../libmatlab/'))
 
 fontSize = 13;
 lineWidth = 2.5;

@@ -3,6 +3,7 @@ clear all;
 format compact; format long;
 addpath(genpath('../')) % local lib codes
 addpath(genpath('../../../../../lib/matlab/')) % lib codes
+%addpath(genpath('../../../../../libmatlab/'))
 fontSize = 12;
 %titleFontSize = fontSize - 2;
 

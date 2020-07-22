@@ -2,6 +2,7 @@ close all;
 clear all;
 format compact; format long;
 addpath(genpath('../../../../../lib/matlab/')) % lib codes
+%addpath(genpath('../../../../../libmatlab/'))
 
 % change directory to the srouce code directory
 filePath = mfilename('fullpath');

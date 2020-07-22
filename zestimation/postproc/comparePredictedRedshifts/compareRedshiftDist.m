@@ -4,6 +4,7 @@ clear all;
 format compact; format long;
 addpath(genpath('../')) % local lib codes
 addpath(genpath('../../../../lib/matlab/')) % lib codes
+%addpath(genpath('../../../../../libmatlab/'))
 
 % change directory to the srouce code directory
 filePath = mfilename('fullpath');
@@ -32,6 +33,7 @@ end
 
 RangeZ = [0.04,60.0];
 rootPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/" + kfac;
+%rootPath = "../../build/winx64/intel/19.1.1.216/release/static/heap/serial/fortran/" + kfac;
 
 % read rival data
 

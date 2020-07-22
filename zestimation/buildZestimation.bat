@@ -435,7 +435,7 @@ echo. from: !ZESTIMATION_ROOT_DIR!\in   %= no need for final slash here =%
 echo.   to: !ZESTIMATION_BIN_DIR!\in\  %= final slash tells this is folder =%
 xcopy /s /Y "!ZESTIMATION_ROOT_DIR!\in" "!ZESTIMATION_BIN_DIR!\in\"
 
-set SAMPLE_FILE_ROOT=D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi
+set SAMPLE_FILE_ROOT=C:\Users\joshu_s8uy48a\Dropbox\Projects\BatseLgrbRedshiftCatalog\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi
 if !LGRB_RATE_MODEL!==H06 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdH06\romberg\bin\out\ParaDRAM_run_20200315_231042_506_process_1_sample.txt
 if !LGRB_RATE_MODEL!==L08 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdL08\romberg\bin\out\ParaDRAM_run_20200316_183919_024_process_1_sample.txt
 if !LGRB_RATE_MODEL!==B10 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdB10\romberg\bin\out\ParaDRAM_run_20200312_060333_408_process_1_sample.txt

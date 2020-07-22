@@ -132,3 +132,30 @@ def getLogRateB10(z):
         else:
             logRateDensity[i] = LogNormFac2 + log_z_plus1[i] * g2
     return logRateDensity+log_coeff + TwiceLogLumDisWicMPC(z_plus1) - ( 3.0*log_z_plus1 + 0.5*log(omega_dm*z_plus1**3+omega_de) )
+
+def getLogRateP15(z):
+    from numpy import pi,log,NINF
+    from TwiceLogLumDisWicMPC import TwiceLogLumDisWicMPC
+    from StarFormationRateDensity import getLogRateDensityP15
+    logz1plus1 = log(5.50)
+    exponentHighZ = -7.8
+    logNormFac2 = -exponentHighZ * logz1plus1
+    omega_dm=0.3
+    omega_de=0.7
+    z_plus1=z+1
+    log_z_plus1=log(z_plus1)
+    log_coef = log(4*pi*3E5)
+    count=len(z)
+    logRateDensity=[0]*len(z)
+    
+    
+    for i in range(count):
+        if (log_z_plus1[i]<0):
+            logRateDensity[i] = NINF
+        elif (log_z_plus1[i]<logz1plus1):
+            logRateDensity[i] = 0
+        else:
+            logRateDensity[i] = log_z_plus1[i]*exponentHighZ + logNormFac2
+        
+        
+    return log_coef + TwiceLogLumDisWicMPC(z_plus1) - ( 3.0*log_z_plus1 + 0.5*log(omega_dm*z_plus1**3+omega_de) )+ logRateDensity

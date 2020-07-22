@@ -12,13 +12,14 @@ model_names=['H06'                  # model names being use
             ,'M14'
             ,'M17'
             ,'F18'
+            ,'P15'
             ]
 
 names_of_txt_files = [ 'LogRate' + model_names for model_names in model_names ]
 
 out_dir = '../out'
 
-folder_destination_to_read=[ out_dir +'/' + names +'/' + names + '_process_1_chain.txt' for names in names_of_txt_files ]
+folder_destination_to_read=[ out_dir +'/' + names +'/' + names + '_process_1_sample.txt' for names in names_of_txt_files ]
 
 sfr_functions = [ getattr(StarFormationRate,'get' + model) for model in names_of_txt_files ] #calls functions within StarFormationRate given model names
 

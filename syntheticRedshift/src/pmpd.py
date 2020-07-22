@@ -12,15 +12,17 @@ pmpd.spec.sampleSize = 10000
 pmpd.spec.domainLowerLimitVec = [0.1]
 pmpd.spec.domainUpperLimitVec = [100]
 
-model_names=['H06'                  # model names being use
+model_names=[
+             'H06'                  # model names being use
             ,'L08'
             ,'B10'
             ,'M14'
             ,'M17'
             ,'F18'
+            ,'P15'
             ]
             
-fileNamesPrefixList =   [ "LogRate"+model in model_names] # makes list of LogRateModelName to name directory for multiple models
+fileNamesPrefixList =   [ "LogRate"+model for model in model_names] # makes list of LogRateModelName to name directory for multiple models
 
 out_dir='../out'
 

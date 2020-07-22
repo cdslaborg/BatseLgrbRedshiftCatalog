@@ -117,3 +117,22 @@ def getLogRateDensityPiecewise(Logzplus1,model):
             else:
                 logRateDensity[i,j] = LogNormFac2 + Logzplus1[i] * g2
     return logRateDensity
+
+
+
+def getLogRateDensityP15(log_z_plus1):
+    from numpy import NINF,log
+    logz1plus1 = log(5.50)
+    exponentHighZ = -7.8
+    logNormFac2 = -exponentHighZ * logz1plus1
+    count=len(z)
+    logRateDensity=[0]*len(z)
+
+    for i in range(count):
+        if (log_z_plus1[i]<0):
+            logRateDensity[i] = NINF
+        elif (log_z_plus1[i]<logz1plus1):
+            logRateDensity[i] = 0
+        else:
+            logRateDensity[i] = log_z_plus1[i]*exponentHighZ + logNormFac2
+    return logRateDensity
