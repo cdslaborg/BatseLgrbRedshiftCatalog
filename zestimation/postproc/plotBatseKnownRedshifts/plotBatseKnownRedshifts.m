@@ -3,12 +3,14 @@ close all;
 format compact; format long;
 filePath = mfilename('fullpath');
 addpath(genpath("../lib/"));
-addpath(genpath('../../../../../lib/matlab/')) % lib codes
+%addpath(genpath('../../../../../lib/matlab/')) % lib codes
+addpath(genpath('../../../../libmatlab/'))
 
 % change directory to the srouce code directory
 filePath = mfilename('fullpath');
 [scriptPath,~,~] = fileparts(filePath); cd(scriptPath); % Change working directory to source code directory.
 cd(scriptPath); % Change working directory to source code directory.
+figureColor = "none";
 
 inPath = "../../in/";
 fontSize = 13;
@@ -35,7 +37,7 @@ end
 
 rootPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/" + kfac;
 
-figExportRequested = 1;
+figExportRequested = 0;
 markerSize = 20;
 if strcmp(scale,"log")
     RangeZ = [0.1,10.0];
@@ -48,13 +50,13 @@ ZModel.Ref = [ "This Work (H06 Rate)"   ...
              , "This Work (B10 Rate)"   ...
              , "This Work (M14 Rate)"   ...
              , "This Work (M17 Rate)"   ...
-             , "This Work (F18 Rate)"   ...
+             ..., "This Work (F18 Rate)"   ...
              , "This Work (P15 Rate)"   ...
              , "Band (2004)"            ...
              , "Fenimore (2000)"        ...
              , "Yonetoku (2004)"        ...
              ];
-ZModel.ID = ["H06","L08","B10","M14","M17","F18","P15"];%,"B04","F00","Y04"];
+ZModel.ID = ["H06","L08","B10","M14","M17","P15"]; %"F18"];%,"B04","F00","Y04"];
 ZModel.count = length(ZModel.ID);
 
 % read BATSE known redshifts
@@ -117,12 +119,16 @@ for imodel = 1:ZModel.count
     end
 
     if figExportRequested
-        figure('visible','off','Color','none');
+        figure('visible','off','Color',figureColor);
     else
-        figure('visible','on','Color','none');
+        figure('visible','on','Color',figureColor);
     end
     hold on; box on;
 
+    % get sum of distance between predicted and measured redshift
+%     DistSq = sum((Y.Dat-X.Dat).^2);
+    
+    
     line(RangeZ, RangeZ, 'color', [0.6 0.6 0.6], 'linewidth', 2);
     ErrPlot = errorbar  ( X.Dat ...
                         , Y.Dat ...
@@ -142,31 +148,40 @@ for imodel = 1:ZModel.count
     ylim(RangeZ);
     set(gca,'xscale',scale)
     set(gca,'yscale',scale)
-    legend  ( [ "equality line" , string(length(Y.Dat)) + " BATSE LGRBs" ] ...
+    legend  ( [ "equality line" , string(length(Y.Dat)) + " BATSE LGRBs"] ...
             , 'location' , 'southeast' ...
             , 'fontSize' , fontSize ...
-            , 'color' , 'none' ...
+            , 'color' , figureColor ...
             );
+        
+
+        
+%     dim = [.15 .4 .5 .5];
+%     str = ['{D_i}^2: ',num2str(DistSq)];
+%     annotation('textbox',dim,'String',str,'FitBoxToText','on');
+
     %legend boxoff;
 
-    %rho = sprintf('%0.2f', corr(log(X.Dat),log(Y.Dat),'type','Pearson'));
-    %%rho = sprintf('%0.2f', corr(X.Dat,Y.Dat,'type','Pearson'));
-   %rhoPos = [0.035,0.93]; %[0.1,15];
-    %text( rhoPos(1), rhoPos(2)-0.08 ...
-    %    , ['\rho = ',num2str(rho)] ...
-    %    , 'HorizontalAlignment', 'left' ...
-    %    , 'units', 'normalized' ...
-    %    , 'Interpreter','tex', 'fontSize' , fontSize )
-
-    % add the joint likelihood of measured redshifts
-   %text( rhoPos(1), rhoPos(2) ...
-   %    , ['log_{10}\pi(Measured|Predicted) = ',sprintf('%.2f',round(SumLogLike{imodel},2))] ...
-   %    , 'HorizontalAlignment', 'left' ...
-   %    , 'units', 'normalized' ...
-   %    , 'Interpreter','tex', 'fontSize' , fontSize )
-
-    set(gca,'color','none', 'fontSize', fontSize)
-    %set(gcf,'color','none')
+%     rho = sprintf('%0.2f', corr(log(X.Dat),log(Y.Dat),'type','Pearson'));
+%     rho = sprintf('%0.2f', corr(X.Dat,Y.Dat,'type','Pearson'));
+%    rhoPos = [0.035,0.93]; %[0.1,15];
+%     text( rhoPos(1), rhoPos(2)-0.08 ...
+%        , ['\rho = ',num2str(rho)] ...
+%        , 'HorizontalAlignment', 'left' ...
+%        , 'units', 'normalized' ...
+%        , 'Interpreter','tex', 'fontSize' , fontSize )
+% 
+% %    add the joint likelihood of measured redshifts
+%    text( rhoPos(1), rhoPos(2) ...
+%       , ['log_{10}\pi(Measured|Predicted) = ',sprintf('%.2f',round(SumLogLike{imodel},2))] ...
+%       , 'HorizontalAlignment', 'left' ...
+%       , 'units', 'normalized' ...
+%       , 'Interpreter','tex', 'fontSize' , fontSize )
+% 
+%     set(gca,'color',figureColor, 'fontSize', fontSize)
+%     set(gcf,'color',figureColor)
+    
+    
     if figExportRequested
         export_fig (fullfile(outDir,ZModel.ID(imodel)+"vsMeasuredZ.png"),"-m2 -transparent")
         hold off; close(gcf);
