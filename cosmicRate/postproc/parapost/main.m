@@ -20,12 +20,17 @@ if ~exist(outDir,'dir')
     mkdir(outDir)
 end
 
-Model.ID = {'H06', 'B10', 'M17', 'F18'}; %, 'L08'
+Model.ID = {'H06' ...
+           , 'B10' ...
+           , 'P15' ...
+           , 'M17' ...
+           ..., 'F18' ...
+            }; %, 'L08'
 Model.count = length(Model.ID);
 
-figRequested = false;
+figRequested = true;
 figDetEffRequested = true;
-paraPostReadRequested = false;
+paraPostReadRequested = true;
 figExportRequested = true;
 verboseRequested = true;
 statRequested = true;
@@ -224,7 +229,9 @@ for imodel = 1:Model.count
         citetalias = [ citetalias, ' & \citetalias{butler2010cosmic}' ];
     elseif strcmp(Model.ID{imodel},'M17')
         citetalias = [ citetalias, ' & \citetalias{madau2017radiation}' ];
-    elseif strcmp(Model.ID{imodel},'F18')
+   % elseif strcmp(Model.ID{imodel},'F18')
+   %     citetalias = [ citetalias, ' & \citetalias{fermi2018gamma}' ];
+    elseif strcmp(Model.ID{imodel},'P15')
         citetalias = [ citetalias, ' & \citetalias{fermi2018gamma}' ];
     else
         error(['unrecognized SFR model: ',Model.ID{imodel}]);
@@ -278,7 +285,7 @@ texTab{irow} = ['\end{table*}']; irow = irow + 1;
 
 
 % write to output file
-fid = fopen([outDir,'tabParaPost.tex'],'w');
+fid = fopen([outDir,'tabParaPost.tex'],'w+');
 fprintf(fid,'%s\n',texTab{:});
 fclose(fid);
 

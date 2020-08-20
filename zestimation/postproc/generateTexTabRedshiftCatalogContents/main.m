@@ -13,7 +13,7 @@ inPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran
 outDir = fullfile("out",kfac);
 mkdir(outDir)
 
-Zmodel.ID = ["H06","B10","M17","F18"];
+Zmodel.ID = ["H06","B10","M17","P15"]; %,"F18"];
 Zmodel.count = length(Zmodel.ID);
 
 for imodel = 1:Zmodel.count
