@@ -58,6 +58,8 @@ call readDataGRB( inFilePath    = inputBatseDataFile    &
     rateModel = "M17"
 #elif defined F18
     rateModel = "F18"
+#elif defined P15
+    rateModel = "P15"
 #else
 #error "Unknown SFR model in WorldModelForBatseLGRB_mod.f90"
 #endif

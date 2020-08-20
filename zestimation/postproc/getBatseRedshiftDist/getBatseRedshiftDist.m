@@ -13,7 +13,7 @@ RangeZ = [0.04,60.0];
 kfac = "kfacOneThird";
 rootPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/" + kfac;
 
-ZModel.ID = ["H06","L08","B10","M14","M17","F18"];%,"B04","F00","Y04"];
+ZModel.ID = ["H06","L08","B10","M14","M17","F18","P15"];%,"B04","F00","Y04"];
 ZModel.count = length(ZModel.ID);
 
 figure;

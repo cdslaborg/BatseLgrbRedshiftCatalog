@@ -3,15 +3,15 @@ clear all;
 format compact; format long;
 filePath = mfilename('fullpath');
 [scriptPath,fileName,fileExt] = fileparts(filePath); cd(scriptPath);
-addpath(genpath('../../../../../lib/matlab/')) % lib codes
+addpath(genpath('../../../../../libmatlab/')) % lib codes
 
 zPlusOneRequested = 1;
 bivarPlotsRequested = 1;
-bivarFigExportRequested = 0;
+bivarFigExportRequested = 1;
 histFigExportRequested = 1;
 fontSize = 13;
 kfacType = 'kfacOneThird';
-syntheticSamplePath = ['../../winx64/intel/release/static/serial/bin/out/',kfacType,'/'];
+synSamPath = ['../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/kfacOneThird/bin/out/'];
 %outPath = '../../out/';
 inPath = '../../in/';
 
@@ -41,7 +41,8 @@ ZModel.Ref = { 'This Work (with H06 Rate)' ...
 ZModel.ID = {'H06','L08','B10'};    %,'B04','F00','Y04'};
 ZPath = cell(length(ZModel.ID),1);
 for imodel = 1:length(ZModel.ID)
-    ZPath{imodel} = ['../../../zestimation/winx64/intel/release/static/serial/',kfacType,'/',ZModel.ID{imodel},'/bin/out/'];
+    ZPath{imodel} = ['../../../zestimation/build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/',kfacType,'/',ZModel.ID{imodel},'/bin/out/'];
+    %ZPath{imodel} = ['../../../zestimation/winx64/intel/release/static/serial/',kfacType,'/',ZModel.ID{imodel},'/bin/out/'];
 end
 
 nvar = 4;
@@ -100,7 +101,7 @@ VarLim =        [ 5.e46, 1.e55  ... log10Liso
                 ];
 
 
-if ~exist(kfacType,'dir'); mkdir(kfacType); end;
+if ~exist(kfacType,'dir'); mkdir(kfacType); end
 
 nVarPair = length(VarPair);
 for iVarPair = 1:nVarPair
@@ -111,13 +112,14 @@ for iVarPair = 1:nVarPair
 
         if ~isfield(ZModel,ZModel.ID{imodel})
 
-            ZModel.(ZModel.ID{imodel}).Synthetic = importdata([syntheticSamplePath,'syntheticSample',ZModel.ID{imodel},'.csv']);
+            ZModel.(ZModel.ID{imodel}).Synthetic = importdata([synSamPath,'syntheticSample',ZModel.ID{imodel},'.csv']);
             ZModel.(ZModel.ID{imodel}).Synthetic.data(:,1:8) = exp( ZModel.(ZModel.ID{imodel}).Synthetic.data(:,1:8) );
 
             % read redshift grid data
             MPC2CM = 3.09e24; % 1 Mega Parsec = MPC2CM centimeters.
             LOGMPC2CMSQ4PI = log(4.0*pi) + 2.0*log(MPC2CM);  % log(MegaParsec2centimeters).
-            ZModel.(ZModel.ID{imodel}).zstat = importdata([ZPath{imodel},'batse_zstat.txt']);
+            zestimationFilePath = getFullPath([ZPath{imodel},'batse_zstat.txt']);
+            ZModel.(ZModel.ID{imodel}).zstat = importdata(zestimationFilePath);
             ZModel.(ZModel.ID{imodel}).zstat.count = length(ZModel.(ZModel.ID{imodel}).zstat.data(:,1));
             % terms to map observer-frame data to rest-frame, equivalent to logRestFrameProp-logObserverFrameProp
             ZModel.(ZModel.ID{imodel}).zstat.IntObsDiff = zeros(ZModel.(ZModel.ID{imodel}).zstat.count,4);
@@ -325,7 +327,7 @@ zdistOutPath = 'zdist/';
 if ~exist(zdistOutPath,'dir'); mkdir(zdistOutPath); end;
 if histFigExportRequested
     fileName = [zdistOutPath,'zdist.png'];
-    export_fig (fileName,'-m2 -transparent');
+    export_fig (fileName,'-m4 -transparent');
     hold off; close(gcf);
 else
     hold off;

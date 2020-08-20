@@ -12,11 +12,14 @@ for rateModel = rateModelList
 
     z = importdata(fullfile(rootDir,'zgrid.txt'));
 
-    figure; hold on;
+    figure; hold on; box on;
     for i = 1:30:zprobFileListLen
         d = importdata(fullfile(rootDir,zprobFileList(i)));
         plot( z.data(:,1) , d.data(:,1) );
     end
+    ylabel("Redshift Probability Density Function: \pi ( z )","interpreter","tex","fontSize",13);
+    xlabel("Redshift: ( z )","interpreter","tex","fontSize",13);
+    title("Redshift PDF of 40 BATSE LGRBs, given " + rateModel + " GRB Rate.");
     hold off;
 
     xlim([0 7])

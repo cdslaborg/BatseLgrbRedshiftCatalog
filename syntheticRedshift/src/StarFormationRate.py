@@ -13,7 +13,7 @@ def getLogRateM14(z):
     z_plus1_coeff=1.0/(b**c)
     log_sfrd=d+a*log_z_plus1-log(1.0+z_plus1_coeff*z_plus1**c)
     return (log_coeff + TwiceLogLumDisWicMPC(z_plus1) - ( 3.0*log_z_plus1 + 0.5*log(omega_dm*z_plus1**3+omega_de) )+log_sfrd)
-        
+
 def getLogRateM17(z):
     from numpy import log,pi
     from TwiceLogLumDisWicMPC import TwiceLogLumDisWicMPC
@@ -29,7 +29,7 @@ def getLogRateM17(z):
     z_plus1_coeff=1.0/(b**c)
     log_sfrd=d+a*log_z_plus1-log(1.0+z_plus1_coeff*z_plus1**c)
     return (log_coeff + TwiceLogLumDisWicMPC(z_plus1) - ( 3.0*log_z_plus1 + 0.5*log(omega_dm*z_plus1**3+omega_de) )+log_sfrd)
-        
+
 def getLogRateF18(z):
     from numpy import log,pi
     from TwiceLogLumDisWicMPC import TwiceLogLumDisWicMPC
@@ -63,7 +63,7 @@ def getLogRateL08(z):
     g2=-4.4600
     LogNormFac1=Logz0plus1Constant*(g0-g1)
     LogNormFac2=(Logz1plus1Constant*(g1-g2))+LogNormFac1
-    
+
     for i in range(count):
         if log_z_plus1[i] < 0:
             logRateDensity[i] = -Inf
@@ -92,7 +92,7 @@ def getLogRateH06(z):
     g2=-7.8
     LogNormFac1=Logz0plus1Constant*(g0-g1)
     LogNormFac2=(Logz1plus1Constant*(g1-g2))+LogNormFac1
-    
+
     for i in range(count):
         if log_z_plus1[i] < 0:
             logRateDensity[i] = -Inf
@@ -121,7 +121,7 @@ def getLogRateB10(z):
     g2=-2.92
     LogNormFac1=Logz0plus1Constant*(g0-g1)
     LogNormFac2=(Logz1plus1Constant*(g1-g2))+LogNormFac1
-    
+
     for i in range(count):
         if log_z_plus1[i] < 0:
             logRateDensity[i] = -Inf
@@ -147,8 +147,7 @@ def getLogRateP15(z):
     log_coef = log(4*pi*3E5)
     count=len(z)
     logRateDensity=[0]*len(z)
-    
-    
+
     for i in range(count):
         if (log_z_plus1[i]<0):
             logRateDensity[i] = NINF
@@ -156,6 +155,5 @@ def getLogRateP15(z):
             logRateDensity[i] = 0
         else:
             logRateDensity[i] = log_z_plus1[i]*exponentHighZ + logNormFac2
-        
-        
+
     return log_coef + TwiceLogLumDisWicMPC(z_plus1) - ( 3.0*log_z_plus1 + 0.5*log(omega_dm*z_plus1**3+omega_de) )+ logRateDensity

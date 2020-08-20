@@ -1,7 +1,7 @@
-:: NOTE: This windows batch script builds the Zestimation object files and the executable
+:: NOTE: This windows batch script builds the SynSam object files and the executable
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: build ParaMonte library and Zestimation object files and executables
+:: build ParaMonte library and SynSam object files and executables
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :: silence cmd output
@@ -13,19 +13,19 @@ set ERRORLEVEL=0
 echo.
 echo. :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 echo. ::::                                                                                                                       ::::
-echo.                                                       Zestimation Build
+echo.                                                       SynSam Build
 echo. ::::                                                                                                                       ::::
 echo. :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 echo.
 
-set BUILD_SCRIPT_NAME=zestimation
+set BUILD_SCRIPT_NAME=SynSam
 
 :: set up compiler version
 
 if not defined COMPILER_VERSION (
 
     echo. -- !BUILD_SCRIPT_NAME! - Detecting the intel Fortran compiler version...
-    cd .\auxil\
+    cd .\..\auxil\
     call getCompilerVersion.bat
     cd %~dp0
     echo. -- !BUILD_SCRIPT_NAME! - COMPILER_VERSION: !COMPILER_VERSION!
@@ -36,10 +36,10 @@ echo.
 echo. -- !BUILD_SCRIPT_NAME! - Configuring build...
 echo.
 
-call configZestimation.bat
+call configSynSam.bat
 if !ERRORLEVEL!==1 (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: Unable to configure and build Zestimation flags. exiting...
+    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: Unable to configure and build SynSam flags. exiting...
     echo.
     cd %~dp0
     set ERRORLEVEL=1
@@ -48,17 +48,19 @@ if !ERRORLEVEL!==1 (
 cd %~dp0
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: generate Zestimation paths
+:: generate SynSam paths
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :: add Kfactor correction if needed
 
-set FPP_FLAGS_ZESTIMATION=/define:!LGRB_RATE_MODEL! /define:kfac!KFAC_CORRECTION! 
+REM set FPP_FLAGS_SYNSAM=/define:!LGRB_RATE_MODEL! /define:kfac!KFAC_CORRECTION!
+set FPP_FLAGS_SYNSAM=/define:kfac!KFAC_CORRECTION!
+if !PARAPOSTNORM_DISABLED!==true set "FPP_FLAGS_SYNSAM=!FPP_FLAGS_SYNSAM! /define:PARAPOSTNORM_DISABLED"
 echo.
 echo. -- !BUILD_SCRIPT_NAME! - Kfactor model: !KFAC_CORRECTION!
 echo.
 echo.
-echo. -- !BUILD_SCRIPT_NAME! - Zestimation's Fortran preprocessor macros: !FPP_FLAGS_COSMIC_RATE!
+echo. -- !BUILD_SCRIPT_NAME! - SynSam's Fortran preprocessor macros: !FPP_FLAGS_COSMIC_RATE!
 echo.
 
 set MEMORY_ALLOCATION=stack
@@ -96,29 +98,30 @@ if exist !ParaMonte_BLD_DIR! (
     exit /B 1
 )
 
-:: set and make Zestimation directories
+:: set and make SynSam directories
 
-set ZESTIMATION_ROOT_DIR=%~dp0
-set ZESTIMATION_BLD_DIR=!ZESTIMATION_ROOT_DIR!!CONFIG_PATH!\kfac!KFAC_CORRECTION!\!LGRB_RATE_MODEL!
-set ZESTIMATION_SRC_DIR=!ZESTIMATION_ROOT_DIR!src
-set ZESTIMATION_BIN_DIR=!ZESTIMATION_BLD_DIR!\bin
-set ZESTIMATION_MOD_DIR=!ZESTIMATION_BLD_DIR!\mod
-set ZESTIMATION_OBJ_DIR=!ZESTIMATION_BLD_DIR!\obj
-REM set ZESTIMATION_LIB_DIR=!ZESTIMATION_BLD_DIR!\lib
+set SYNSAM_ROOT_DIR=%~dp0
+REM set SYNSAM_BLD_DIR=!SYNSAM_ROOT_DIR!!CONFIG_PATH!\kfac!KFAC_CORRECTION!\!LGRB_RATE_MODEL!
+set SYNSAM_BLD_DIR=!SYNSAM_ROOT_DIR!!CONFIG_PATH!\kfac!KFAC_CORRECTION!
+set SYNSAM_SRC_DIR=!SYNSAM_ROOT_DIR!src
+set SYNSAM_BIN_DIR=!SYNSAM_BLD_DIR!\bin
+set SYNSAM_MOD_DIR=!SYNSAM_BLD_DIR!\mod
+set SYNSAM_OBJ_DIR=!SYNSAM_BLD_DIR!\obj
+REM set SYNSAM_LIB_DIR=!SYNSAM_BLD_DIR!\lib
 
-:: loop over Zestimation directories and generate them
+:: loop over SynSam directories and generate them
 
 echo.
 for %%A in (
-    !ZESTIMATION_BLD_DIR!
-    !ZESTIMATION_BIN_DIR!
-    !ZESTIMATION_LIB_DIR!
-    !ZESTIMATION_MOD_DIR!
-    !ZESTIMATION_OBJ_DIR!
+    !SYNSAM_BLD_DIR!
+    !SYNSAM_BIN_DIR!
+    !SYNSAM_LIB_DIR!
+    !SYNSAM_MOD_DIR!
+    !SYNSAM_OBJ_DIR!
     ) do (  if exist %%A (
                 echo. -- !BUILD_SCRIPT_NAME! - %%A already exists. skipping...
             ) else (
-                echo. -- !BUILD_SCRIPT_NAME! - generating Zestimation directory: %%A
+                echo. -- !BUILD_SCRIPT_NAME! - generating SynSam directory: %%A
                 mkdir %%A
             )
 )
@@ -149,7 +152,7 @@ if !COMPILER_SUITE!==intel (
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 REM echo. FPP_FLAGS_EXTRA = !FPP_FLAGS_EXTRA!
 REM /define:IS_ENABLED
-set FPP_FLAGS=/fpp !FPP_CFI_FLAG! !FPP_LANG_FLAG! !FPP_BUILD_FLAGS! !FPP_FCL_FLAGS! !FPP_DLL_FLAGS! !FPP_FLAGS_ZESTIMATION!
+set FPP_FLAGS=/fpp !FPP_CFI_FLAG! !FPP_LANG_FLAG! !FPP_BUILD_FLAGS! !FPP_FCL_FLAGS! !FPP_DLL_FLAGS! !FPP_FLAGS_SYNSAM!
 REM set FPP_FLAGS=/fpp !FPP_CFI_FLAG! !FPP_LANG_FLAG! !FPP_BUILD_FLAGS! !FPP_FCL_FLAGS! !FPP_DLL_FLAGS! !USER_PREPROCESSOR_MACROS! !FPP_FLAGS_EXTRA!
 :: to save the intermediate files use this on the command line: FPP /Qsave_temps <original file> <intermediate file>
 
@@ -264,27 +267,27 @@ echo. -- !BUILD_SCRIPT_NAME! - Fortran compiler/linker flags in !BTYPE! build mo
 echo.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: generate Zestimation object files
+:: generate SynSam object files
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-if !ZESTIMATION_OBJ_BUILD_ENABLED! NEQ true (
+if !SYNSAM_OBJ_BUILD_ENABLED! NEQ true (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping Zestimation object files build...
+    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping SynSam object files build...
     echo.
-    goto LABEL_ZESTIMATION_EXE_BUILD_ENABLED
+    goto LABEL_SYNSAM_EXE_BUILD_ENABLED
 )
 :: Read the name of each file from the ordered list of filenames in filelist.txt to compile
 
-cd !ZESTIMATION_OBJ_DIR!
+cd !SYNSAM_OBJ_DIR!
 echo.
-echo. -- !BUILD_SCRIPT_NAME! - building Zestimation program...
+echo. -- !BUILD_SCRIPT_NAME! - building SynSam program...
 
 :: First verify the source filelist exists
 
-set FILE_LIST=!ZESTIMATION_SRC_DIR!\filelist.txt
+set FILE_LIST=!SYNSAM_SRC_DIR!\filelist.txt
 if not exist !FILE_LIST! (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: The filelist.txt containing the Zestimation source filenames does not exist. Path: !FILE_LIST!
+    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: The filelist.txt containing the SynSam source filenames does not exist. Path: !FILE_LIST!
     echo. -- !BUILD_SCRIPT_NAME! - build failed. exiting...
     echo.
     cd %~dp0
@@ -297,10 +300,10 @@ for /F "eol=! tokens=*" %%A in (!FILE_LIST!) do (
     echo. -- !BUILD_SCRIPT_NAME! - generating object file for %%A
 
     !FCL! !FCL_FLAGS! !FPP_FLAGS! ^
-    /module:!ZESTIMATION_MOD_DIR!       %=path to output Zestimation module files=% ^
-    /I:!ZESTIMATION_MOD_DIR!            %=path to output Zestimation module files, needed 4 dependencies=%  ^
-    /I:!ParaMonte_MOD_DIR!              %=path to input Astronomy library module files=%  ^
-    /c !ZESTIMATION_SRC_DIR!\%%A        %=path to input Zestimation source file=%  ^
+    /module:!SYNSAM_MOD_DIR!       %=path to output SynSam module files=% ^
+    /I:!SYNSAM_MOD_DIR!            %=path to output SynSam module files, needed 4 dependencies=%  ^
+    /I:!ParaMonte_MOD_DIR!         %=path to input Astronomy library module files=%  ^
+    /c !SYNSAM_SRC_DIR!\%%A        %=path to input SynSam source file=%  ^
     || (
         echo.
         echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: compilation of the object file for %%A failed.
@@ -315,60 +318,61 @@ for /F "eol=! tokens=*" %%A in (!FILE_LIST!) do (
 echo.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: generate Zestimation executable
+:: generate SynSam executable
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:LABEL_ZESTIMATION_EXE_BUILD_ENABLED
+:LABEL_SYNSAM_EXE_BUILD_ENABLED
 
-if !ZESTIMATION_EXE_BUILD_ENABLED! NEQ true (
+if !SYNSAM_EXE_BUILD_ENABLED! NEQ true (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping Zestimation exectuable build...
+    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping SynSam exectuable build...
     echo.
-    goto LABEL_ZESTIMATION_RUN_ENABLED
+    goto LABEL_SYNSAM_RUN_ENABLED
 )
 
 echo.
 
-set ZESTIMATION_EXECUTABLE_NAME=!LGRB_RATE_MODEL!.exe
+REM set SYNSAM_EXECUTABLE_NAME=!LGRB_RATE_MODEL!.exe
+set SYNSAM_EXECUTABLE_NAME=main.exe
 
 if !LTYPE!==dynamic (
 
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: dynamically-linked Zestimation executable not implemented. This requires significant changes in the library interfaces.
-    echo. -- !BUILD_SCRIPT_NAME! - generating statically-linked Zestimation executable at: !ZESTIMATION_BIN_DIR!
+    echo. -- !BUILD_SCRIPT_NAME! - Warning: dynamically-linked SynSam executable not implemented. This requires significant changes in the library interfaces.
+    echo. -- !BUILD_SCRIPT_NAME! - generating statically-linked SynSam executable at: !SYNSAM_BIN_DIR!
     echo.
 
-    REM  copy necessary DLL files in the Zestimation executable's directory
+    REM  copy necessary DLL files in the SynSam executable's directory
 
-    echo. -- !BUILD_SCRIPT_NAME! - copying the ParaMonte library files to the Zestimation executable directory...
+    echo. -- !BUILD_SCRIPT_NAME! - copying the ParaMonte library files to the SynSam executable directory...
     echo. -- !BUILD_SCRIPT_NAME! - from: !ParaMonte_LIB_DIR!\    %= no need for final slash here =%
-    echo. -- !BUILD_SCRIPT_NAME! -   to: !ZESTIMATION_BIN_DIR!   %= final slash tells this is folder =%
-    xcopy /s /Y "!ParaMonte_LIB_DIR!" "!ZESTIMATION_BIN_DIR!\"
+    echo. -- !BUILD_SCRIPT_NAME! -   to: !SYNSAM_BIN_DIR!   %= final slash tells this is folder =%
+    xcopy /s /Y "!ParaMonte_LIB_DIR!" "!SYNSAM_BIN_DIR!\"
     echo.
 
-    echo. -- !BUILD_SCRIPT_NAME! - generating dynamically-linked Zestimation executable at: !ZESTIMATION_BIN_DIR!
+    echo. -- !BUILD_SCRIPT_NAME! - generating dynamically-linked SynSam executable at: !SYNSAM_BIN_DIR!
 
 
-    set REQUIRED_OBJECT_FILES=!ZESTIMATION_OBJ_DIR!\*.obj !ParaMonte_LIB_DIR!\*.lib
+    set REQUIRED_OBJECT_FILES=!SYNSAM_OBJ_DIR!\*.obj !ParaMonte_LIB_DIR!\*.lib
     set FCL_FLAGS=!FCL_FLAGS! /align:commons
 
 ) else (    %= static linking requested =%
 
-    echo. -- !BUILD_SCRIPT_NAME! - generating statically-linked Zestimation executable at: !ZESTIMATION_BIN_DIR!
-    set REQUIRED_OBJECT_FILES=!ZESTIMATION_OBJ_DIR!\*.obj !ParaMonte_LIB_DIR!\*.lib
+    echo. -- !BUILD_SCRIPT_NAME! - generating statically-linked SynSam executable at: !SYNSAM_BIN_DIR!
+    set REQUIRED_OBJECT_FILES=!SYNSAM_OBJ_DIR!\*.obj !ParaMonte_LIB_DIR!\*.lib
 
 )
 
 :: delete the old executable first
 
-echo. deleting old executable (if any) at: !ZESTIMATION_BIN_DIR!\!ZESTIMATION_EXECUTABLE_NAME!
+echo. deleting old executable (if any) at: !SYNSAM_BIN_DIR!\!SYNSAM_EXECUTABLE_NAME!
 
-cd !ZESTIMATION_BIN_DIR!
+cd !SYNSAM_BIN_DIR!
 
-del !ZESTIMATION_EXECUTABLE_NAME!
+del !SYNSAM_EXECUTABLE_NAME!
 if !ERRORLEVEL!==1 (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: deletion of the old executable at !ZESTIMATION_BIN_DIR!\!ZESTIMATION_EXECUTABLE_NAME! failed. exiting...
+    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: deletion of the old executable at !SYNSAM_BIN_DIR!\!SYNSAM_EXECUTABLE_NAME! failed. exiting...
     echo.
     cd %~dp0
     set ERRORLEVEL=1
@@ -379,22 +383,22 @@ if !ERRORLEVEL!==1 (
 
 echo.
 echo. -- !BUILD_SCRIPT_NAME! - Compilation command: !FCL! !FCL_FLAGS! !FL_FLAGS! ^
-/module:!ZESTIMATION_MOD_DIR! ^
-/I:!ZESTIMATION_MOD_DIR! /I:!ParaMonte_MOD_DIR! ^
+/module:!SYNSAM_MOD_DIR! ^
+/I:!SYNSAM_MOD_DIR! /I:!ParaMonte_MOD_DIR! ^
 !REQUIRED_OBJECT_FILES! ^
-/exe:!ZESTIMATION_BIN_DIR!\!ZESTIMATION_EXECUTABLE_NAME!
+/exe:!SYNSAM_BIN_DIR!\!SYNSAM_EXECUTABLE_NAME!
 
 echo.
 
 !FCL! !FCL_FLAGS! !FL_FLAGS! ^
-/module:!ZESTIMATION_MOD_DIR! ^
-/I:!ZESTIMATION_MOD_DIR! /I:!ParaMonte_MOD_DIR! ^
+/module:!SYNSAM_MOD_DIR! ^
+/I:!SYNSAM_MOD_DIR! /I:!ParaMonte_MOD_DIR! ^
 !REQUIRED_OBJECT_FILES! ^
-/exe:!ZESTIMATION_BIN_DIR!\!ZESTIMATION_EXECUTABLE_NAME!
+/exe:!SYNSAM_BIN_DIR!\!SYNSAM_EXECUTABLE_NAME!
 
 if !ERRORLEVEL!==1 (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: linking of the Zestimation object files may have likely failed.
+    echo. -- !BUILD_SCRIPT_NAME! - Fatal Error: linking of the SynSam object files may have likely failed.
     echo. -- !BUILD_SCRIPT_NAME! - build may have likely failed. continuing...
     echo.
     cd %~dp0
@@ -403,20 +407,20 @@ if !ERRORLEVEL!==1 (
 )
 
 echo.
-echo. -- !BUILD_SCRIPT_NAME! - the binary directory: !ZESTIMATION_BIN_DIR!
+echo. -- !BUILD_SCRIPT_NAME! - the binary directory: !SYNSAM_BIN_DIR!
 echo.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: run Zestimation executable
+:: run SynSam executable
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:LABEL_ZESTIMATION_RUN_ENABLED
+:LABEL_SYNSAM_RUN_ENABLED
 
-:: run Zestimation
-:: if !ZESTIMATION_RUN_ENABLED! NEQ true goto LABEL_EXAMPLE_BUILD_ENABLED
-if !ZESTIMATION_RUN_ENABLED! NEQ true (
+:: run SynSam
+:: if !SYNSAM_RUN_ENABLED! NEQ true goto LABEL_EXAMPLE_BUILD_ENABLED
+if !SYNSAM_RUN_ENABLED! NEQ true (
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping Zestimation run...
+    echo. -- !BUILD_SCRIPT_NAME! - Warning: skipping SynSam run...
     echo.
     goto :eof
 )
@@ -424,41 +428,41 @@ if !ZESTIMATION_RUN_ENABLED! NEQ true (
 echo.
 echo. :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 echo. ::::                                                                                                                       ::::
-echo.                                             Running Zestimation
+echo.                                             Running SynSam
 echo. ::::                                                                                                                       ::::
 echo. :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 echo.
 
 :: copy necessary input files in the executable's directory
-echo. copying input files to the Zestimation executable's directory
-echo. from: !ZESTIMATION_ROOT_DIR!\in   %= no need for final slash here =%
-echo.   to: !ZESTIMATION_BIN_DIR!\in\  %= final slash tells this is folder =%
-xcopy /s /Y "!ZESTIMATION_ROOT_DIR!\in" "!ZESTIMATION_BIN_DIR!\in\"
+echo. copying input files to the SynSam executable's directory
+echo. from: !SYNSAM_ROOT_DIR!\in    %= no need for final slash here =%
+echo.   to: !SYNSAM_BIN_DIR!\in\    %= final slash tells this is folder =%
+xcopy /s /Y "!SYNSAM_ROOT_DIR!\in" "!SYNSAM_BIN_DIR!\in\"
 
 REM set SAMPLE_FILE_ROOT=C:\Users\joshu_s8uy48a\Dropbox\Projects\BatseLgrbRedshiftCatalog\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi
 set SAMPLE_FILE_ROOT=D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi
-if !LGRB_RATE_MODEL!==H06 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdH06\romberg\bin\out\ParaDRAM_run_20200315_231042_506_process_1_sample.txt
-if !LGRB_RATE_MODEL!==L08 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdL08\romberg\bin\out\ParaDRAM_run_20200316_183919_024_process_1_sample.txt
-if !LGRB_RATE_MODEL!==B10 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdB10\romberg\bin\out\ParaDRAM_run_20200312_060333_408_process_1_sample.txt
-if !LGRB_RATE_MODEL!==M14 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdM14\romberg\bin\out\ParaDRAM_run_20200319_011001_166_process_1_sample.txt
-if !LGRB_RATE_MODEL!==M17 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdM17\romberg\bin\out\ParaDRAM_run_20200313_032933_429_process_1_sample.txt
-if !LGRB_RATE_MODEL!==F18 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdF18\romberg\bin\out\ParaDRAM_run_20200314_021639_172_process_1_sample.txt
-if !LGRB_RATE_MODEL!==P15 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdP15\romberg\bin\out\ParaDRAM_run_20200722_004444_354_process_1_sample.txt
-echo.
-echo.
-echo. -- !BUILD_SCRIPT_NAME! - sample file path: !SAMPLE_FILE_PATH!
-echo.
+REM if !LGRB_RATE_MODEL!==H06 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdH06\romberg\bin\out\ParaDRAM_run_20200315_231042_506_process_1_sample.txt
+REM if !LGRB_RATE_MODEL!==L08 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdL08\romberg\bin\out\ParaDRAM_run_20200316_183919_024_process_1_sample.txt
+REM if !LGRB_RATE_MODEL!==B10 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdB10\romberg\bin\out\ParaDRAM_run_20200312_060333_408_process_1_sample.txt
+REM if !LGRB_RATE_MODEL!==M14 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdM14\romberg\bin\out\ParaDRAM_run_20200319_011001_166_process_1_sample.txt
+REM if !LGRB_RATE_MODEL!==M17 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdM17\romberg\bin\out\ParaDRAM_run_20200313_032933_429_process_1_sample.txt
+REM if !LGRB_RATE_MODEL!==F18 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdF18\romberg\bin\out\ParaDRAM_run_20200314_021639_172_process_1_sample.txt
+REM if !LGRB_RATE_MODEL!==P15 set SAMPLE_FILE_PATH=!SAMPLE_FILE_ROOT!\kfacOneThirdP15\romberg\bin\out\ParaDRAM_run_20200722_004444_354_process_1_sample.txt
+REM echo.
+REM echo.
+REM echo. -- !BUILD_SCRIPT_NAME! - sample file path: !SAMPLE_FILE_PATH!
+REM echo.
 
-cd !ZESTIMATION_BIN_DIR!
-!ZESTIMATION_EXECUTABLE_NAME! ./in/ Zestimation.nml !SAMPLE_FILE_PATH! && (
+cd !SYNSAM_BIN_DIR!
+!SYNSAM_EXECUTABLE_NAME! ./in/SynSam.nml && (
     echo.
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Zestimation run successful.
+    echo. -- !BUILD_SCRIPT_NAME! - SynSam run successful.
     echo.
 ) || (
     echo.
     echo.
-    echo. -- !BUILD_SCRIPT_NAME! - Zestimation run failed. exiting...
+    echo. -- !BUILD_SCRIPT_NAME! - SynSam run failed. exiting...
     echo.
     cd %~dp0
     set ERRORLEVEL=1

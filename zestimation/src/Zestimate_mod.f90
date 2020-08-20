@@ -15,6 +15,8 @@ module Zestimate_mod
     use StarFormation_mod, only: getLogSFR => getLogRateM17
 #elif defined F18
     use StarFormation_mod, only: getLogSFR => getLogRateF18
+#elif defined P15
+    use StarFormation_mod, only: getLogSFR => getLogRateP15
 #else
 #error "Unknown SFR model in BatseLgrbWorldModel_mod.f90"
 #endif

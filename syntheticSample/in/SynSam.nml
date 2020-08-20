@@ -1,0 +1,19 @@
+&SynSam
+    SynRedFilePath(1) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateH06\LogRateH06_process_1_sample.txt"
+    SynRedFilePath(2) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateL08\LogRateL08_process_1_sample.txt"
+    SynRedFilePath(3) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateB10\LogRateB10_process_1_sample.txt"
+    SynRedFilePath(4) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateM14\LogRateM14_process_1_sample.txt"
+    SynRedFilePath(5) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateM17\LogRateM17_process_1_sample.txt"
+    SynRedFilePath(6) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateF18\LogRateF18_process_1_sample.txt"
+    SynRedFilePath(7) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\syntheticRedshift\build\LogRateP15\LogRateP15_process_1_sample.txt"
+    ParaPostFilePath(1) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdH06\romberg\bin\out\ParaDRAM_run_20200315_231042_506_process_1_sample.txt"
+    ParaPostFilePath(2) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdL08\romberg\bin\out\ParaDRAM_run_20200316_183919_024_process_1_sample.txt"
+    ParaPostFilePath(3) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdB10\romberg\bin\out\ParaDRAM_run_20200312_060333_408_process_1_sample.txt"
+    ParaPostFilePath(4) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdM14\romberg\bin\out\ParaDRAM_run_20200319_011001_166_process_1_sample.txt"
+    ParaPostFilePath(5) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdM17\romberg\bin\out\ParaDRAM_run_20200313_032933_429_process_1_sample.txt"
+    ParaPostFilePath(6) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdF18\romberg\bin\out\ParaDRAM_run_20200314_021639_172_process_1_sample.txt"
+    ParaPostFilePath(7) = "D:\Dropbox\Projects\20181213_BatseLgrbRedshift\git\cosmicRate\build\linuxx64\intel\18.0.2.199\release\static\mpi\kfacOneThirdP15\romberg\bin\out\ParaDRAM_run_20200722_004444_354_process_1_sample.txt"
+    GrbFormationModel = "M14", "M17", "F18", "P15" ! "H06", "L08", "B10", 
+    outPathBase = ".\out\"
+
+/
