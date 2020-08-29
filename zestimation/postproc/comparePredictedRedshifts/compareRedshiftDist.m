@@ -12,9 +12,10 @@ filePath = mfilename('fullpath');
 cd(scriptPath); % Change working directory to source code directory.
 
 fontSize = 13;
+figureColor = "white";
 errBarLineWidth = 0.5;
 kfac = "kfacOneThird";
-confidence = 50;
+confidence = 90;
 
 outDirRoot = fullfile(scriptPath,"out");
 mkdir(outDirRoot);
@@ -121,7 +122,7 @@ for iRival = 1:ZModel.count
             Y.Err.Pos   = zeros(length(Y.Data),1);
         end
 
-        figure('visible','off','Color','none');
+        figure('visible','off','Color',figureColor);
         hold on; box on;
 
         line(RangeZ, RangeZ, 'color', [0.6 0.6 0.6], 'linewidth', 2);
@@ -146,14 +147,14 @@ for iRival = 1:ZModel.count
         legend  ( { 'equality line' , [num2str(length(Y.Data)),' BATSE LGRBs'] } ...
                 , 'location' , 'southeast' ...
                 , 'fontSize' , fontSize ...
-                , 'color' , 'none' ...
+                , 'color' , figureColor ...
                 )
         %legend boxoff;
         rho = sprintf('%0.2f', corr(log(X.Data),log(Y.Data)));
         rhoPos = [0.05,40]; %[0.1,15];
         text(rhoPos(1),rhoPos(2),['\rho = ',num2str(rho)],'HorizontalAlignment','left','Interpreter','tex', 'fontSize' , fontSize )
-        set(gca,'color','none', 'fontSize', fontSize)
-        set(gcf,'color','none')
+        set(gca,'color',figureColor, 'fontSize', fontSize)
+        set(gcf,'color',figureColor)
         export_fig ( fullfile(outDir,ZModel.ID(iRival)+ZModel.ID(jRival)+".png"), "-m4 -transparent" )
         hold off;
         close(gcf);

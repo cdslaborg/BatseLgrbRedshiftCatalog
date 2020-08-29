@@ -10,7 +10,7 @@ addpath(genpath('../../../../libmatlab/'))
 filePath = mfilename('fullpath');
 [scriptPath,~,~] = fileparts(filePath); cd(scriptPath); % Change working directory to source code directory.
 cd(scriptPath); % Change working directory to source code directory.
-figureColor = "none";
+figureColor = "white";
 
 inPath = "../../in/";
 fontSize = 13;
@@ -37,7 +37,7 @@ end
 
 rootPath = "../../build/winx64/intel/19.0.4.245/release/static/heap/serial/fortran/" + kfac;
 
-figExportRequested = 0;
+figExportRequested = 1;
 markerSize = 20;
 if strcmp(scale,"log")
     RangeZ = [0.1,10.0];

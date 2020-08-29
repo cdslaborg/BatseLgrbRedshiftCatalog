@@ -14,6 +14,7 @@ filePath = mfilename('fullpath');
 cd(scriptPath); % Change working directory to source code directory.
 
 fontSize = 15;
+figureColor = "white";
 kfac = 'kfacOneThird';
 outDir = [kfac,'/'];
 if ~exist(outDir,'dir')
@@ -30,7 +31,7 @@ Model.count = length(Model.ID);
 
 figRequested = true;
 figDetEffRequested = true;
-paraPostReadRequested = true;
+paraPostReadRequested = false;
 figExportRequested = true;
 verboseRequested = true;
 statRequested = true;
@@ -132,9 +133,9 @@ if figRequested
         disp(['generting figure ',varnames{icol}]);
 
         if figExportRequested
-            figure('visible','off','Color','none');
+            figure('visible','off','Color',figureColor);
         else
-            figure('visible','on'); %,'Color','none');
+            figure('visible','on'); %,'Color',figureColor);
         end
         hold on; box on;
 
@@ -165,11 +166,11 @@ if figRequested
         legend  ( Model.ID ...
                 , 'location' , legendLocation ...
                 , 'fontSize' , fontSize ...
-                , 'color' , 'none' ...
+                , 'color' , figureColor ...
                 )
 
         if figExportRequested
-            set ( gca , 'color' , 'none' , 'fontSize' , fontSize )
+            set ( gca , 'color' , figureColor , 'fontSize' , fontSize )
             export_fig ([outDir,varnames{icol},'.png'],'-m2 -transparent')
             hold off; close(gcf);
         else
@@ -317,9 +318,9 @@ if figDetEffRequested
     end
 
     if figExportRequested
-        figure('visible','off','Color','none');
+        figure('visible','off','Color',figureColor);
     else
-        figure('visible','on'); %,'Color','none');
+        figure('visible','on'); %,'Color',figureColor);
     end
     hold on; box on; colormap('cool');
 
@@ -349,12 +350,12 @@ if figDetEffRequested
         legend  ( detEffLegend ...
                 , 'location' , 'southeast' ...
                 , 'fontSize' , fontSize ...
-                , 'color' , 'none' ...
+                , 'color' , figureColor ...
                 , 'box', 'off' ...
                 );
 
     if figExportRequested
-        set ( gca , 'color' , 'none' , 'fontSize' , fontSize )
+        set ( gca , 'color' , figureColor , 'fontSize' , fontSize )
         export_fig (fileName,'-m2 -transparent')
         hold off; close(gcf);
     else
